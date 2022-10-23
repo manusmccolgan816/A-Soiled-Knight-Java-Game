@@ -1,0 +1,25 @@
+140 11 64 64
+// The first line should contain the width and height of the
+// map and the width and height of each tile. A list of character to
+// tile mappings is then provided where each character is preceded by a
+// # character. The dot character always defaults to a blank space
+// Note that the referenced files should be in the same directory as the
+// tile map.
+#w=CastleWallResized.png
+#s=CastleSpikesResized.png
+#b=CastlePillarBottomResized.png
+#m=CastlePillarMiddleResized.png
+#t=CastlePillarTopResized.png
+#e=HorseShoeTileResized.png
+#map
+wwwwwwwwwwwwww.................................................................wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+wwwwwwwwwwwwww.................................................................wwwwwwwwwwwwwwwwwwww........................................w
+wwwwwwwwwwwwww.........................................e.......................wwwwwwwwwwwwwwwwwwww........................................w
+wwwwwwwwwwwwww.........................................w.......................wwwwwwwwwwwwwwwwwwww........................................w
+wwwwwwwwwwwwww.................................................................wwwwwwwwwwwwwwwwwwww.......................................ew
+w.t.........t........................................w..........................t................t...........wwwwwwwwwwwww...w..w..w...wwwww
+w.m.........m.............e......................w.....................w........m.......e........m..........wwwwwwwwwwwwwwssswsswsswssswwwww
+w.m.........m.........wwwwwwww..wwwww..................................w...w....m................m.........wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+w.b.........b.......wwwwwwwwwwsswwwww..........w......................wwssswww..b.w............w.b..s.....wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
