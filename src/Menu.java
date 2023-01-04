@@ -10,31 +10,31 @@ import java.awt.event.MouseMotionListener;
 
 public class Menu extends GameCore implements MouseListener, MouseMotionListener {
 
-    private Animation titleIdle;
-    private Animation whiteKnightIdleRight;
+    private final Animation titleIdle;
+    private final Animation whiteKnightIdleRight;
 
-    private Sprite titleText;
-    private Sprite whiteKnight;
+    private final Sprite titleText;
+    private final Sprite whiteKnight;
 
-    private Image imgTitleBackground;
-    private Image imgTitleText;
-    private Image imgStart;
-    private Image imgControls;
-    private Image imgWhiteKnightIdleRight;
+    private final Image imgTitleBackground;
+    private final Image imgTitleText;
+    private final Image imgStart;
+    private final Image imgControls;
+    private final Image imgWhiteKnightIdleRight;
 
-    private float startPosX;
-    private float startPosY;
-    private float controlsPosX;
-    private float controlsPosY;
+    private final float startPosX;
+    private final float startPosY;
+    private final float controlsPosX;
+    private final float controlsPosY;
 
-    //Clip clip;
     Sound titleSong;
 
-    private Game game;
+    private final Game game;
 
     public Menu(Game game) {
         this.game = game;
 
+        //Start the title theme
         titleSong = new Sound("sounds/ChessTitleThemeSecond.wav");
         titleSong.start();
 
@@ -45,6 +45,7 @@ public class Menu extends GameCore implements MouseListener, MouseMotionListener
         imgControls = loadImage("images/ControlsButtonResized.png");
         imgWhiteKnightIdleRight = loadImage("images/WhiteKnightResizedRight.png");
 
+        //Set the positions of the buttons
         startPosX = 208 + getInsets().left;
         startPosY = 324 + getInsets().top;
         controlsPosX = 208 + getInsets().left;

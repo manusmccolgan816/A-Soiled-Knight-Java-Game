@@ -2,12 +2,9 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
-
-
 import game2D.*;
 import sound.Filter3d;
 import sound.PlayMIDI;
@@ -15,16 +12,6 @@ import sound.SoundManager;
 import sound.SoundSample;
 
 import javax.sound.sampled.AudioFormat;
-
-/*
-Game demonstrates how we can override the GameCore class
-to create our own 'game'. We usually need to implement at
-least 'draw' and 'update' (not including any local event handling)
-to begin the process. You should also add code to the 'init'
-method that will initialise event handlers etc. By default, GameCore
-will handle the 'Escape' key to quit the game, but you should
-override this with your own event handler.
-*/
 
 /**
  * @author Manus McColgan
@@ -47,6 +34,7 @@ public class Game extends GameCore implements MouseListener {
     private boolean isPaused;
     private boolean isJustPaused;
     private boolean isJustResumed;
+
     //Determines whether player can jump based on whether the space key has been released since jumping
     private boolean canJump;
     private boolean isFacingRight;
@@ -70,12 +58,13 @@ public class Game extends GameCore implements MouseListener {
 
     private Sprite whiteKnight = null;
 
-    private TileMap tmap = new TileMap();
+    private final TileMap tmap = new TileMap();
 
     private Menu menu;
     private Controls controls;
     private HUD hud;
     private GameOver gameOver;
+    private Completed completed;
     private Level level1;
     private Level level2;
     private Level level3;
@@ -86,7 +75,6 @@ public class Game extends GameCore implements MouseListener {
     private static final AudioFormat PLAYBACK_FORMAT = new AudioFormat
             (44100, 16, 1, true, false);
     private SoundManager soundManager;
-    private Filter3d enemyJumpDistanceFilter;
     private ArrayList<Filter3d> enemyJumpDistanceFilters;
     private SoundSample jumpSound;
     private SoundSample hitHurtSound;
@@ -112,12 +100,12 @@ public class Game extends GameCore implements MouseListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         pack();
-        //x is the amount of pixels hidden by the left and right borders of our window
+        //x is the amount of pixels hidden by the left and right borders of the window
         int x = getInsets().left + getInsets().right;
-        //y is the amount of pixels hidden by the title bar and the bottom border of our window
+        //y is the amount of pixels hidden by the title bar and the bottom border of the window
         int y = getInsets().top + getInsets().bottom;
 
-        //Now we set the size of our window as the size wanted PLUS the amount of pixels hidden
+        //Now we set the size of the window as the desired size PLUS the amount of pixels hidden
         setPreferredSize(new Dimension(SCREEN_WIDTH + x, SCREEN_HEIGHT + y));
 
         setMaximumSize(new Dimension(SCREEN_WIDTH + x, SCREEN_HEIGHT + y));
@@ -199,7 +187,7 @@ public class Game extends GameCore implements MouseListener {
         gameState = STATE.Menu;
         CURRENTLEVEL = 0; //Progress is not saved, when 'Start' is clicked the player will start at level 1
 
-        //Remove the mouse listeners for the game over screen
+        //Remove the mouse listeners which may still be running for the game over screen
         removeMouseListener(gameOver);
         removeMouseListener(controls);
 
@@ -211,7 +199,7 @@ public class Game extends GameCore implements MouseListener {
     }
 
     /**
-     * Called to display controls screen
+     * Called to display controls screen.
      */
     public void initialiseControls() {
         controls = new Controls(this);
@@ -225,14 +213,14 @@ public class Game extends GameCore implements MouseListener {
     }
 
     /**
-     * You will probably want to put code to restart a game in
-     * a separate method so that you can call it to restart
-     * the game.
+     * This method can be called to restart a game multiple times,
+     * whereas init() need only be called once at the beginning.
      */
     public void initialiseGame() {
         removeMouseListener(menu);
         removeMouseMotionListener(menu);
 
+        //Set up the initial state of the player character
         whiteKnight.setVelocityX(0);
         whiteKnight.setVelocityY(0);
         whiteKnight.setAnimation(whiteKnightIdleRight);
@@ -251,6 +239,9 @@ public class Game extends GameCore implements MouseListener {
         recoveryTimer = 0;
     }
 
+    /**
+     * Called to display the game over screen.
+     */
     public void initialiseGameOver() {
         backgroundSong.stop();
 
@@ -260,6 +251,19 @@ public class Game extends GameCore implements MouseListener {
 
         //Add mouse listener to game over screen
         addMouseListener(gameOver);
+    }
+
+    /**
+     * Called to display the game completed screen.
+     */
+    public void initialiseCompleted() {
+        backgroundSong.stop();
+
+        gameState = STATE.Completed;
+
+        completed = new Completed(this);
+
+        addMouseListener(completed);
     }
 
     /**
@@ -289,6 +293,9 @@ public class Game extends GameCore implements MouseListener {
         else if(gameState == STATE.GameOver) {
             gameOver.draw(g);
         }
+        else if(gameState == STATE.Completed) {
+            completed.draw(g);
+        }
     }
 
     /**
@@ -313,6 +320,9 @@ public class Game extends GameCore implements MouseListener {
         }
         else if (gameState == STATE.GameOver) {
             gameOver.update(elapsed);
+        }
+        else if(gameState == STATE.Completed) {
+            completed.update(elapsed);
         }
     }
 
@@ -765,7 +775,7 @@ public class Game extends GameCore implements MouseListener {
         LinkedList<Sprite> sprites = new LinkedList<>();
         LinkedList<ID> spriteIDs = new LinkedList<>();
 
-        //Game over screen mouse listeners are removed
+        //Game over screen mouse listener is removed if it is running
         removeMouseListener(gameOver);
 
         //If there is no current level...
@@ -776,12 +786,15 @@ public class Game extends GameCore implements MouseListener {
             //Load the background image
             Image imgBackground = loadImage("images/RollingHillsResized.png");
 
+            //Initialise the HUD, giving the max health for the level and the number of horse shoes to collect
             hud = new HUD(4, 4, 0, countHorseShoesInMap(tmap));
 
+            //Set the position of the player
             whiteKnight.setPosition(tmap.getTileXC(6, 0), tmap.getTileYC(0, 8));
             sprites.add(whiteKnight);
             spriteIDs.add(ID.Player);
 
+            //Set the positions of the level's enemies
             Sprite blackPawn0 = new Sprite(blackPawnBob);
             blackPawn0.show();
             blackPawn0.setPosition(tmap.getTileXC(12, 0), tmap.getTileYC(0, 8));
@@ -808,6 +821,7 @@ public class Game extends GameCore implements MouseListener {
             sprites.add(blackKnight2);
             spriteIDs.add(ID.EnemyBlackKnight);
 
+            //Play the background track
             backgroundSong = new PlayMIDI();
             try {
                 backgroundSong.play("sounds/StoneTower.mid");
@@ -831,7 +845,6 @@ public class Game extends GameCore implements MouseListener {
 
             level1 = new Level(sprites, spriteIDs, tmap, imgBackground);
             CURRENTLEVEL = 1;
-            gameState = STATE.Game;
         }
         else if(CURRENTLEVEL == 1) {
             //Load the tile map
@@ -902,7 +915,6 @@ public class Game extends GameCore implements MouseListener {
 
             level2 = new Level(sprites, spriteIDs, tmap, imgBackground);
             CURRENTLEVEL = 2;
-            gameState = STATE.Game;
         }
         else if(CURRENTLEVEL == 2) {
             //Load the tile maps
@@ -941,8 +953,8 @@ public class Game extends GameCore implements MouseListener {
 
             level3 = new Level(sprites, spriteIDs, tmap, imgBackground);
             CURRENTLEVEL = 3;
-            gameState = STATE.Game;
         }
+        gameState = STATE.Game;
     }
 
     /**
@@ -951,6 +963,8 @@ public class Game extends GameCore implements MouseListener {
      * @param e The event that has been generated
      */
     public void keyPressed(KeyEvent e) {
+        if(gameState != STATE.Game) return;
+
         int key = e.getKeyCode();
 
         if(key == KeyEvent.VK_P) {
@@ -987,6 +1001,7 @@ public class Game extends GameCore implements MouseListener {
      * @param e The event that has been generated
      */
     public void keyReleased(KeyEvent e) {
+        if(gameState != STATE.Game) return;
         int key = e.getKeyCode();
 
         if(isPaused) return;
@@ -1225,9 +1240,9 @@ public class Game extends GameCore implements MouseListener {
         @Override
         public void update(long elapsed) {
             if(isPaused) {
-                //If this is the first time this call of Level.update() since the pause button was pressed
+                //If this is the first call of Level.update() since the pause button was pressed...
                 if(isJustPaused) {
-                    //If the game is being paused for the second (third, ... onward) time during the same recovery
+                    //If the game is being paused for the second (third, ... onward) time during the same recovery...
                     if(isRecovering && pauseTimer != 0) {
                         //Assign the previous length of time paused for to lastPauseTimer
                         lastPauseTimer = pauseTimer;
@@ -1268,7 +1283,7 @@ public class Game extends GameCore implements MouseListener {
                 }
             }
             else {
-                //If this is the first time this method has been run since the resume button was pressed
+                //If this is the first call of Level.update() since the resume button was pressed...
                 if(isJustResumed) {
                     //Get the time paused for
                     pauseTimer = (System.nanoTime() - pauseTimer);

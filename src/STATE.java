@@ -2,5 +2,6 @@ public enum STATE {
     Menu,
     Controls,
     Game,
-    GameOver;
+    GameOver,
+    Completed
 }

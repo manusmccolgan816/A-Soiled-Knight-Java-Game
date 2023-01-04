@@ -3,18 +3,18 @@ import game2D.GameCore;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+
 
 public class GameOver extends GameCore implements MouseListener {
 
-    private Game game;
-    private Image imgGameOverScreen;
-    private Image imgRetry;
-    private Image imgQuit;
-    private float retryPosX;
-    private float retryPosY;
-    private float quitPosX;
-    private float quitPosY;
+    private final Game game;
+    private final Image imgGameOverScreen;
+    private final Image imgRetry;
+    private final Image imgQuit;
+    private final float retryPosX;
+    private final float retryPosY;
+    private final float quitPosX;
+    private final float quitPosY;
 
     public GameOver(Game game) {
         this.game = game;
