@@ -187,7 +187,7 @@ public class Game extends GameCore implements MouseListener {
         gameState = STATE.Menu;
         CURRENTLEVEL = 0; //Progress is not saved, when 'Start' is clicked the player will start at level 1
 
-        //Remove the mouse listeners which may still be running for the game over screen
+        //Remove the mouse listeners which may still be running for the game over or controls screens
         removeMouseListener(gameOver);
         removeMouseListener(controls);
 
@@ -777,6 +777,7 @@ public class Game extends GameCore implements MouseListener {
 
         //Game over screen mouse listener is removed if it is running
         removeMouseListener(gameOver);
+        removeMouseListener(controls);
 
         //If there is no current level...
         if(CURRENTLEVEL == 0) {
@@ -916,44 +917,48 @@ public class Game extends GameCore implements MouseListener {
             level2 = new Level(sprites, spriteIDs, tmap, imgBackground);
             CURRENTLEVEL = 2;
         }
-        else if(CURRENTLEVEL == 2) {
-            //Load the tile maps
-            tmap.loadMap("maps", "Level3Map.txt");
-
-            //Load the background image
-            Image imgBackground = loadImage("images/RollingHillsResized.png");
-
-            hud = new HUD(3, 3, 0, countHorseShoesInMap(tmap));
-
-            whiteKnight.setPosition(tmap.getTileXC(4, 0), tmap.getTileYC(0, 17));
-
-            sprites.add(whiteKnight);
-            spriteIDs.add(ID.Player);
-
-            backgroundSong = new PlayMIDI();
-            try {
-                backgroundSong.play("sounds/StoneTower.mid");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            //Initialise the array of 3d sound filters
-            enemyJumpDistanceFilters = new ArrayList<>();
-            //Go over every sprite in the level
-            for(int i = 0; i < sprites.size(); i++) {
-                if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
-                    //If the sprite is a blackKnight, it is added to the 3d sound filter list
-                    enemyJumpDistanceFilters.add(new Filter3d(whiteKnight, sprites.get(i), SCREEN_WIDTH));
-                }
-                else {
-                    //If the sprite is not a blackKnight, add null to the list as a filter will not be needed for them
-                    enemyJumpDistanceFilters.add(null);
-                }
-            }
-
-            level3 = new Level(sprites, spriteIDs, tmap, imgBackground);
-            CURRENTLEVEL = 3;
+        else {
+            initialiseCompleted();
+            return;
         }
+//        else if(CURRENTLEVEL == 2) {
+//            //Load the tile maps
+//            tmap.loadMap("maps", "Level3Map.txt");
+//
+//            //Load the background image
+//            Image imgBackground = loadImage("images/RollingHillsResized.png");
+//
+//            hud = new HUD(3, 3, 0, countHorseShoesInMap(tmap));
+//
+//            whiteKnight.setPosition(tmap.getTileXC(4, 0), tmap.getTileYC(0, 17));
+//
+//            sprites.add(whiteKnight);
+//            spriteIDs.add(ID.Player);
+//
+//            backgroundSong = new PlayMIDI();
+//            try {
+//                backgroundSong.play("sounds/StoneTower.mid");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//            //Initialise the array of 3d sound filters
+//            enemyJumpDistanceFilters = new ArrayList<>();
+//            //Go over every sprite in the level
+//            for(int i = 0; i < sprites.size(); i++) {
+//                if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
+//                    //If the sprite is a blackKnight, it is added to the 3d sound filter list
+//                    enemyJumpDistanceFilters.add(new Filter3d(whiteKnight, sprites.get(i), SCREEN_WIDTH));
+//                }
+//                else {
+//                    //If the sprite is not a blackKnight, add null to the list as a filter will not be needed for them
+//                    enemyJumpDistanceFilters.add(null);
+//                }
+//            }
+//
+//            level3 = new Level(sprites, spriteIDs, tmap, imgBackground);
+//            CURRENTLEVEL = 3;
+//        }
         gameState = STATE.Game;
     }
 

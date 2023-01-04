@@ -17,7 +17,7 @@ public class Completed extends GameCore implements MouseListener {
         imgCompleted = loadImage("images/EndScreenResized.png");
         imgQuit = loadImage("images/QuitButtonEndScreenResized.png");
         quitPosX = 236 + getInsets().left;
-        quitPosY = 232 + getInsets().top;
+        quitPosY = 332 + getInsets().top;
     }
 
     public void update(long elapsed) {
@@ -39,7 +39,8 @@ public class Completed extends GameCore implements MouseListener {
         //If Quit is clicked...
         if(mouseX >= quitPosX && mouseX <= (quitPosX + imgQuit.getWidth(null)) && mouseY >= quitPosY &&
                 mouseY <= (quitPosY + imgQuit.getHeight(null))) {
-
+            game.initialiseMenu();
+            removeMouseListener(this);
         }
     }
 
