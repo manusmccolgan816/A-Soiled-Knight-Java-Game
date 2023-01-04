@@ -1,3 +1,5 @@
+package sound;
+
 import java.util.LinkedList;
 
 /**
@@ -12,11 +14,11 @@ public class ThreadPool extends ThreadGroup {
     private static int threadPoolID;
 
     /**
-     Creates a new ThreadPool.
+     Creates a new sound.ThreadPool.
      @param numThreads The number of threads in the pool.
      */
     public ThreadPool(int numThreads) {
-        super("ThreadPool-" + (threadPoolID++));
+        super("sound.ThreadPool-" + (threadPoolID++));
         setDaemon(true);
 
         isAlive = true;
@@ -30,10 +32,10 @@ public class ThreadPool extends ThreadGroup {
     /**
      Requests a new task to run. This method returns
      immediately, and the task executes on the next available
-     idle thread in this ThreadPool.
+     idle thread in this sound.ThreadPool.
      <p>Tasks start execution in the order they are received.
      @param task The task to run. If null, no action is taken.
-     @throws IllegalStateException if this ThreadPool is
+     @throws IllegalStateException if this sound.ThreadPool is
      already closed.
      */
     public synchronized void runTask(Runnable task) {
@@ -58,10 +60,10 @@ public class ThreadPool extends ThreadGroup {
     }
 
     /**
-     Closes this ThreadPool and returns immediately. All
+     Closes this sound.ThreadPool and returns immediately. All
      threads are stopped, and any waiting tasks are not
-     executed. Once a ThreadPool is closed, no more tasks can
-     be run on this ThreadPool.
+     executed. Once a sound.ThreadPool is closed, no more tasks can
+     be run on this sound.ThreadPool.
      */
     public synchronized void close() {
         if (isAlive) {
@@ -72,11 +74,11 @@ public class ThreadPool extends ThreadGroup {
     }
 
     /**
-     Closes this ThreadPool and waits for all running threads
+     Closes this sound.ThreadPool and waits for all running threads
      to finish. Any waiting tasks are executed.
      */
     public void join() {
-        //Notify all waiting threads that this ThreadPool is no longer alive
+        //Notify all waiting threads that this sound.ThreadPool is no longer alive
         synchronized (this) {
             isAlive = false;
             notifyAll();
@@ -112,7 +114,7 @@ public class ThreadPool extends ThreadGroup {
     }
 
     /**
-     A PooledThread is a Thread in a ThreadPool group, designed
+     A PooledThread is a Thread in a sound.ThreadPool group, designed
      to run tasks (Runnables).
      */
     private class PooledThread extends Thread {

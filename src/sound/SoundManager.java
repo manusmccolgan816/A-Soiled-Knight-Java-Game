@@ -1,10 +1,11 @@
+package sound;
+
 import java.io.*;
 import javax.sound.sampled.*;
-import javax.sound.midi.*;
 
 /**
- * The SoundManager class manages sound playback. The SoundManager is a ThreadPool, with each thread playing back one
- * sound at a time. This allows the SoundManager to easily limit the number of simultaneous sounds being played.
+ * The sound.SoundManager class manages sound playback. The sound.SoundManager is a sound.ThreadPool, with each thread playing back one
+ * sound at a time. This allows the sound.SoundManager to easily limit the number of simultaneous sounds being played.
  */
 public class SoundManager extends ThreadPool {
 
@@ -15,7 +16,7 @@ public class SoundManager extends ThreadPool {
     private boolean paused;
 
     /**
-     * Creates a new SoundManager with the specified maximum number of simultaneous sounds.
+     * Creates a new sound.SoundManager with the specified maximum number of simultaneous sounds.
      *
      * @param playbackFormat the file format of the audio clips
      * @param maxSimultaneousSounds the maximum number of sounds that can play at once
@@ -171,7 +172,7 @@ public class SoundManager extends ThreadPool {
     }
 
     /**
-     * Plays a sound with an optional SoundFilter, and optionally looping. This method returns immediately.
+     * Plays a sound with an optional sound.SoundFilter, and optionally looping. This method returns immediately.
      *
      * @param sound the sound to play
      * @param filter the optional filter to play over the sound
@@ -224,7 +225,7 @@ public class SoundManager extends ThreadPool {
      * Signals that a PooledThread has started. Creates the Thread's line and buffer.
      */
     protected void threadStarted() {
-        //Wait for the SoundManager constructor to finish
+        //Wait for the sound.SoundManager constructor to finish
         synchronized (this) {
             try {
                 wait();

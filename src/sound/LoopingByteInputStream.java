@@ -1,8 +1,10 @@
+package sound;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
- * The LoopingByteInputStream is a ByteArrayInputStream that loops indefinitely. The looping stops when the close()
+ * The sound.LoopingByteInputStream is a ByteArrayInputStream that loops indefinitely. The looping stops when the close()
  * method is called.
  */
 public class LoopingByteInputStream extends ByteArrayInputStream {
@@ -10,9 +12,9 @@ public class LoopingByteInputStream extends ByteArrayInputStream {
     private boolean closed;
 
     /**
-     * Creates a new LoopingByteInputStream with the specified byte array. The array is not copied.
+     * Creates a new sound.LoopingByteInputStream with the specified byte array. The array is not copied.
      *
-     * @param buffer the array of which to create the LoopingByteInputStream
+     * @param buffer the array of which to create the sound.LoopingByteInputStream
      */
     public LoopingByteInputStream(byte[] buffer) {
         super(buffer);

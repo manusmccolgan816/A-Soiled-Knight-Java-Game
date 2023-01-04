@@ -9,6 +9,10 @@ import java.util.Random;
 
 
 import game2D.*;
+import sound.Filter3d;
+import sound.PlayMIDI;
+import sound.SoundManager;
+import sound.SoundSample;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -1080,13 +1084,9 @@ public class Game extends GameCore implements MouseListener {
         return hud;
     }
 
-    public void setHud(HUD hud) {
-        this.hud = hud;
-    }
-
     class Level extends GameCore {
 
-        private TileMap tmap;
+        private final TileMap tmap;
 
         private LinkedList<Sprite> sprites;
         private LinkedList<ID> spriteIDs;
@@ -1100,8 +1100,8 @@ public class Game extends GameCore implements MouseListener {
          */
         private long lastPauseTimer;
 
-        private Image imgBackground;
-        private int backgroundWidth;
+        private final Image imgBackground;
+        private final int backgroundWidth;
         private float backgroundX, backgroundX2;
         private int previousXOffset;
 
@@ -1146,13 +1146,9 @@ public class Game extends GameCore implements MouseListener {
                     xOffset = (int) clamp(xOffset, -tmap.getPixelWidth() + SCREEN_WIDTH + getInsets().left,
                             getInsets().right);
 
-                    //If the screen hasn't scrolled along the x-axis since the last run of Level.draw()...
-                    if(xOffset == previousXOffset) {
-                        screenScrolling = false;
-                    }
-                    else {
-                        screenScrolling = true;
-                    }
+                    //screenScrolling is false if the screen hasn't scrolled along the x-axis since the last run of
+                    //Level.draw(), otherwise true
+                    screenScrolling = xOffset != previousXOffset;
 
                     previousXOffset = xOffset;
 

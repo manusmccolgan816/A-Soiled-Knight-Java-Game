@@ -1,7 +1,9 @@
+package sound;
+
 import game2D.Sprite;
 
 /**
- * The Filter3d class is a SoundFilter that creates a 3D sound effect. The sound is filtered so that it is quieter
+ * The sound.Filter3d class is a sound.SoundFilter that creates a 3D sound effect. The sound is filtered so that it is quieter
  * the farther away the sound source is from the listener.
  */
 public class Filter3d extends SoundFilter {
@@ -11,11 +13,11 @@ public class Filter3d extends SoundFilter {
 
     private Sprite source;
     private Sprite listener;
-    private int maxDistance;
+    private final int maxDistance;
     private float lastVolume;
 
     /**
-     * Creates a new Filter3d object with the specified source and listener Sprites. The Sprite's position can be
+     * Creates a new sound.Filter3d object with the specified source and listener Sprites. The Sprite's position can be
      * changed while this filter is running.
      *
      * @param source the Sprite that makes the sound
@@ -65,9 +67,9 @@ public class Filter3d extends SoundFilter {
             }
 
             //Change the volume of the sample
-            short oldSample = getSample(samples, i);
+            short oldSample = SoundFilter.getSample(samples, i);
             short newSample = (short)(oldSample * volume);
-            setSample(samples, i, newSample);
+            SoundFilter.setSample(samples, i, newSample);
         }
         lastVolume = newVolume;
     }

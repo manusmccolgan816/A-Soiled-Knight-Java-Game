@@ -1,6 +1,8 @@
+package sound;
+
 /**
  * An abstract class designed to filter sound samples. Since SoundFilters may use internal buffering of samples, a new
- * SoundFilter object should be created for every sound played. However, SoundFilters can be reused after they are
+ * sound.SoundFilter object should be created for every sound played. However, SoundFilters can be reused after they are
  * finished by calling the reset() method.
  * Assimes all samples are 16 bit, signed, little-endian format.
  */

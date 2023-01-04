@@ -1,9 +1,11 @@
+package sound;
+
 import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * The FilteredSoundStream class is a FilterInputStream that applies a SoundFilter to the underlying input stream.
+ * The sound.FilteredSoundStream class is a FilterInputStream that applies a sound.SoundFilter to the underlying input stream.
  */
 public class FilteredSoundStream extends FilterInputStream {
 
@@ -13,7 +15,7 @@ public class FilteredSoundStream extends FilterInputStream {
     private int remainingSize;
 
     /**
-     * Creates a new FilteredSoundStream object with the specified InputStream and SoundFilter.
+     * Creates a new sound.FilteredSoundStream object with the specified InputStream and sound.SoundFilter.
      *
      * @param in
      * @param soundFilter
