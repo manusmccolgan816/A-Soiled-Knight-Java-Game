@@ -56,7 +56,6 @@ public class GameOver extends GameCore implements MouseListener {
         else if(mouseX >= quitPosX && mouseX <= (quitPosX + imgQuit.getWidth(null)) && mouseY >= quitPosY &&
                 mouseY <= (quitPosY + imgQuit.getHeight(null))) {
             game.initialiseMenu();
-            removeMouseListener(this);
         }
     }
 

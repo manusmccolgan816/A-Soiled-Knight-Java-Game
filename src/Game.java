@@ -187,9 +187,10 @@ public class Game extends GameCore implements MouseListener {
         gameState = STATE.Menu;
         CURRENTLEVEL = 0; //Progress is not saved, when 'Start' is clicked the player will start at level 1
 
-        //Remove the mouse listeners which may still be running for the game over or controls screens
+        //Remove the mouse listeners which may still be running for other objects
         removeMouseListener(gameOver);
         removeMouseListener(controls);
+        removeMouseListener(completed);
 
         menu = new Menu(this);
 

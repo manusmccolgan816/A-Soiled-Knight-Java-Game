@@ -40,7 +40,6 @@ public class Completed extends GameCore implements MouseListener {
         if(mouseX >= quitPosX && mouseX <= (quitPosX + imgQuit.getWidth(null)) && mouseY >= quitPosY &&
                 mouseY <= (quitPosY + imgQuit.getHeight(null))) {
             game.initialiseMenu();
-            removeMouseListener(this);
         }
     }
 
