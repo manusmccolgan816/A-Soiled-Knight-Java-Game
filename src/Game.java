@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 import game2D.*;
+import sound.FadeWithDistanceFilterSound;
 import sound.Filter3d;
 import sound.PlayMIDI;
-import sound.SoundManager;
 import sound.SoundSample;
 
 import javax.sound.sampled.AudioFormat;
@@ -67,19 +67,19 @@ public class Game extends GameCore implements MouseListener {
     private Completed completed;
     private Level level1;
     private Level level2;
-    private Level level3;
 
     private PlayMIDI backgroundSong;
 
     //Uncompressed, 16 bit, mono, signed, little-endian format
-    private static final AudioFormat PLAYBACK_FORMAT = new AudioFormat
-            (44100, 16, 1, true, false);
-    private SoundManager soundManager;
-    private ArrayList<Filter3d> enemyJumpDistanceFilters;
-    private SoundSample jumpSound;
-    private SoundSample hitHurtSound;
-    private SoundSample pickupHorseshoeSound;
-    private SoundSample pauseSound;
+//    private static final AudioFormat PLAYBACK_FORMAT = new AudioFormat
+//            (44100, 16, 1, true, false);
+    //private ArrayList<Filter3d> enemyJumpDistanceFilters;
+//    private ArrayList<FadeWithDistanceFilterSound> enemyJumpDistanceFilters;
+
+    private final String jumpSoundFilepath = "sounds/jump16bit.wav";
+    private final String hitHurtSoundFilepath = "sounds/hitHurt16bit.wav";
+    private final String pickupHorseshoeSoundFilepath = "sounds/pickupHorseshoe16bit.wav";
+    private final String pauseSoundFilepath = "sounds/pause16bit.wav";
 
     /**
      * The main method that creates an instance of our class and starts it running.
@@ -169,12 +169,6 @@ public class Game extends GameCore implements MouseListener {
 
         //Initialise the player with an animation
         whiteKnight = new Sprite(whiteKnightIdleRight);
-
-        soundManager = new SoundManager(PLAYBACK_FORMAT, 6);
-        jumpSound = soundManager.getSound("sounds/jump16bit.wav");
-        hitHurtSound = soundManager.getSound("sounds/hitHurt16bit.wav");
-        pickupHorseshoeSound = soundManager.getSound("sounds/pickupHorseshoe16bit.wav");
-        pauseSound = soundManager.getSound("sounds/pause16bit.wav");
 
         initialiseGame();
         goToNextLevel();
@@ -286,9 +280,6 @@ public class Game extends GameCore implements MouseListener {
             else if(CURRENTLEVEL == 2) {
                 level2.draw(g);
             }
-            else if(CURRENTLEVEL == 3) {
-                level3.draw(g);
-            }
             hud.draw(g);
         }
         else if(gameState == STATE.GameOver) {
@@ -314,9 +305,6 @@ public class Game extends GameCore implements MouseListener {
             }
             else if(CURRENTLEVEL == 2) {
                 level2.update(elapsed);
-            }
-            else if(CURRENTLEVEL == 3) {
-                level3.update(elapsed);
             }
         }
         else if (gameState == STATE.GameOver) {
@@ -413,7 +401,8 @@ public class Game extends GameCore implements MouseListener {
                 {
                     if(ch == 's') {
                         if(!isRecovering) {
-                            soundManager.play(hitHurtSound);
+                            new Sound(hitHurtSoundFilepath).start();
+
                             hud.setHealth(hud.getHealth() - 1);
 
                             if(hud.getHealth() <= 0) {
@@ -457,7 +446,8 @@ public class Game extends GameCore implements MouseListener {
         }
         //If s is the player and collided with a horse shoe
         else if(ch == 'e' && id == ID.Player) {
-            soundManager.play(pickupHorseshoeSound);
+            new Sound(pickupHorseshoeSoundFilepath).start();
+
             tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
             hud.incrementHorseShoesCollected();
 
@@ -480,7 +470,8 @@ public class Game extends GameCore implements MouseListener {
                 {
                     if(ch == 's') {
                         if(!isRecovering) {
-                            soundManager.play(hitHurtSound);
+                            new Sound(hitHurtSoundFilepath).start();
+
                             hud.setHealth(hud.getHealth() - 1);
 
                             if(hud.getHealth() <= 0) {
@@ -523,7 +514,8 @@ public class Game extends GameCore implements MouseListener {
         }
         //If s is the player and collided with a horse shoe
         else if(ch == 'e' && id == ID.Player) {
-            soundManager.play(pickupHorseshoeSound);
+            new Sound(pickupHorseshoeSoundFilepath).start();
+
             tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
             hud.incrementHorseShoesCollected();
 
@@ -548,7 +540,8 @@ public class Game extends GameCore implements MouseListener {
                 {
                     if(ch == 's') {
                         if(!isRecovering) {
-                            soundManager.play(hitHurtSound);
+                            new Sound(hitHurtSoundFilepath).start();
+
                             hud.setHealth(hud.getHealth() - 1);
 
                             if(hud.getHealth() <= 0) {
@@ -580,7 +573,8 @@ public class Game extends GameCore implements MouseListener {
             }
             //If s is the player and collided with a horse shoe
             else if(ch == 'e' && id == ID.Player) {
-                soundManager.play(pickupHorseshoeSound);
+                new Sound(pickupHorseshoeSoundFilepath).start();
+
                 tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
                 hud.incrementHorseShoesCollected();
 
@@ -602,7 +596,8 @@ public class Game extends GameCore implements MouseListener {
                 {
                     if(ch == 's') {
                         if(!isRecovering) {
-                            soundManager.play(hitHurtSound);
+                            new Sound(hitHurtSoundFilepath).start();
+
                             hud.setHealth(hud.getHealth() - 1);
 
                             if(hud.getHealth() <= 0) {
@@ -633,7 +628,8 @@ public class Game extends GameCore implements MouseListener {
             }
             //If s is the player and collided with a horse shoe
             else if(ch == 'e' && id == ID.Player) {
-                soundManager.play(pickupHorseshoeSound);
+                new Sound(pickupHorseshoeSoundFilepath).start();
+
                 tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
                 hud.incrementHorseShoesCollected();
 
@@ -654,7 +650,8 @@ public class Game extends GameCore implements MouseListener {
         if(ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') { //If it's a ground tile, handle it
             if(ch == 's' && id == ID.Player) {
                 if(!isRecovering) {
-                    soundManager.play(hitHurtSound);
+                    new Sound(hitHurtSoundFilepath).start();
+
                     hud.setHealth(hud.getHealth() - 1);
 
                     if(hud.getHealth() <= 0) {
@@ -691,7 +688,8 @@ public class Game extends GameCore implements MouseListener {
         }
         //If s is the player and collided with a horse shoe
         else if(ch == 'e' && id == ID.Player) {
-            soundManager.play(pickupHorseshoeSound);
+            new Sound(pickupHorseshoeSoundFilepath).start();
+
             tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
             hud.incrementHorseShoesCollected();
 
@@ -711,7 +709,8 @@ public class Game extends GameCore implements MouseListener {
         if(ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') { //If it's a ground tile, handle it
             if(ch == 's' && id == ID.Player) {
                 if(!isRecovering) {
-                    soundManager.play(hitHurtSound);
+                    new Sound(hitHurtSoundFilepath).start();
+
                     hud.setHealth(hud.getHealth() - 1);
 
                     if(hud.getHealth() <= 0) {
@@ -746,7 +745,8 @@ public class Game extends GameCore implements MouseListener {
         }
         //If s is the player and collided with a horse shoe
         else if(ch == 'e' && id == ID.Player) {
-            soundManager.play(pickupHorseshoeSound);
+            new Sound(pickupHorseshoeSoundFilepath).start();
+
             tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
             hud.incrementHorseShoesCollected();
 
@@ -832,18 +832,20 @@ public class Game extends GameCore implements MouseListener {
             }
 
             //Initialise the array of 3d sound filters
-            enemyJumpDistanceFilters = new ArrayList<>();
+//            enemyJumpDistanceFilters = new ArrayList<>();
             //Go over every sprite in the level
-            for(int i = 0; i < sprites.size(); i++) {
-                if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
-                    //If the sprite is a blackKnight, it is added to the 3d sound filter list
-                    enemyJumpDistanceFilters.add(new Filter3d(whiteKnight, sprites.get(i), SCREEN_WIDTH));
-                }
-                else {
-                    //If the sprite is not a blackKnight, add null to the list as a filter will not be needed for them
-                    enemyJumpDistanceFilters.add(null);
-                }
-            }
+//            for(int i = 0; i < sprites.size(); i++) {
+//                if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
+//                    //If the sprite is a blackKnight, it is added to the 3d sound filter list
+////                    enemyJumpDistanceFilters.add(new Filter3d(whiteKnight, sprites.get(i), SCREEN_WIDTH));
+//                    enemyJumpDistanceFilters.add(new FadeWithDistanceFilterSound(
+//                            jumpSoundFilepath, whiteKnight, sprites.get(i), SCREEN_WIDTH));
+//                }
+//                else {
+//                    //If the sprite is not a blackKnight, add null to the list as a filter will not be needed for them
+//                    enemyJumpDistanceFilters.add(null);
+//                }
+//            }
 
             level1 = new Level(sprites, spriteIDs, tmap, imgBackground);
             CURRENTLEVEL = 1;
@@ -902,18 +904,20 @@ public class Game extends GameCore implements MouseListener {
             }
 
             //Initialise the array of 3d sound filters
-            enemyJumpDistanceFilters = new ArrayList<>();
+//            enemyJumpDistanceFilters = new ArrayList<>();
             //Go over every sprite in the level
-            for(int i = 0; i < sprites.size(); i++) {
-                if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
-                    //If the sprite is a blackKnight, it is added to the 3d sound filter list
-                    enemyJumpDistanceFilters.add(new Filter3d(whiteKnight, sprites.get(i), SCREEN_WIDTH));
-                }
-                else {
-                    //If the sprite is not a blackKnight, add null to the list as a filter will not be needed for them
-                    enemyJumpDistanceFilters.add(null);
-                }
-            }
+//            for(int i = 0; i < sprites.size(); i++) {
+//                if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
+//                    //If the sprite is a blackKnight, it is added to the 3d sound filter list
+////                    enemyJumpDistanceFilters.add(new Filter3d(whiteKnight, sprites.get(i), SCREEN_WIDTH));
+//                    enemyJumpDistanceFilters.add(new FadeWithDistanceFilterSound(
+//                            jumpSoundFilepath, whiteKnight, sprites.get(i), SCREEN_WIDTH));
+//                }
+//                else {
+//                    //If the sprite is not a blackKnight, add null to the list as a filter will not be needed for them
+//                    enemyJumpDistanceFilters.add(null);
+//                }
+//            }
 
             level2 = new Level(sprites, spriteIDs, tmap, imgBackground);
             CURRENTLEVEL = 2;
@@ -1218,7 +1222,7 @@ public class Game extends GameCore implements MouseListener {
                     //'Start' the pause timer
                     pauseTimer = System.nanoTime();
 
-                    soundManager.play(pauseSound);
+                    new Sound(pauseSoundFilepath).start();
                     backgroundSong.stop();
 
                     //Set whiteKnight's animation back to what it should be
@@ -1338,7 +1342,7 @@ public class Game extends GameCore implements MouseListener {
                             //s jumps
                             s.setVelocityY(clamp((s.getVelocityY() + 0.1f) * -7.5f, -3, 0));
 
-                            soundManager.play(jumpSound);
+                            new Sound(jumpSoundFilepath).start();
                         }
                         //endregion
 
@@ -1387,7 +1391,10 @@ public class Game extends GameCore implements MouseListener {
                                     s.setAnimation(blackKnightIdleRight);
 
                                 //Play the 3d sound filter for the given blackKnight
-                                soundManager.play(jumpSound, enemyJumpDistanceFilters.get(i), false);
+                                //soundManager.play(jumpSound, enemyJumpDistanceFilters.get(i));
+                                new FadeWithDistanceFilterSound(jumpSoundFilepath, whiteKnight,
+                                        sprites.get(i), SCREEN_WIDTH).start();
+
                             }
                         }
                         //endregion
@@ -1454,7 +1461,7 @@ public class Game extends GameCore implements MouseListener {
                                 //region Player on enemy collision
                                 if(!isRecovering) {
                                     if(boundingBoxCollision(s, s2)) {
-                                        soundManager.play(hitHurtSound);
+                                        new Sound(hitHurtSoundFilepath).start();
 
                                         HUD h = getHud();
 
