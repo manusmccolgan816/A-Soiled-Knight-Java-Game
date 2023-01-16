@@ -6,10 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 import game2D.*;
-import sound.FadeWithDistanceFilterSound;
-import sound.Filter3d;
-import sound.PlayMIDI;
-import sound.SoundSample;
+import sound.*;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -69,12 +66,6 @@ public class Game extends GameCore implements MouseListener {
     private Level level2;
 
     private PlayMIDI backgroundSong;
-
-    //Uncompressed, 16 bit, mono, signed, little-endian format
-//    private static final AudioFormat PLAYBACK_FORMAT = new AudioFormat
-//            (44100, 16, 1, true, false);
-    //private ArrayList<Filter3d> enemyJumpDistanceFilters;
-//    private ArrayList<FadeWithDistanceFilterSound> enemyJumpDistanceFilters;
 
     private final String jumpSoundFilepath = "sounds/jump16bit.wav";
     private final String hitHurtSoundFilepath = "sounds/hitHurt16bit.wav";
@@ -831,22 +822,6 @@ public class Game extends GameCore implements MouseListener {
                 e.printStackTrace();
             }
 
-            //Initialise the array of 3d sound filters
-//            enemyJumpDistanceFilters = new ArrayList<>();
-            //Go over every sprite in the level
-//            for(int i = 0; i < sprites.size(); i++) {
-//                if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
-//                    //If the sprite is a blackKnight, it is added to the 3d sound filter list
-////                    enemyJumpDistanceFilters.add(new Filter3d(whiteKnight, sprites.get(i), SCREEN_WIDTH));
-//                    enemyJumpDistanceFilters.add(new FadeWithDistanceFilterSound(
-//                            jumpSoundFilepath, whiteKnight, sprites.get(i), SCREEN_WIDTH));
-//                }
-//                else {
-//                    //If the sprite is not a blackKnight, add null to the list as a filter will not be needed for them
-//                    enemyJumpDistanceFilters.add(null);
-//                }
-//            }
-
             level1 = new Level(sprites, spriteIDs, tmap, imgBackground);
             CURRENTLEVEL = 1;
         }
@@ -902,22 +877,6 @@ public class Game extends GameCore implements MouseListener {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            //Initialise the array of 3d sound filters
-//            enemyJumpDistanceFilters = new ArrayList<>();
-            //Go over every sprite in the level
-//            for(int i = 0; i < sprites.size(); i++) {
-//                if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
-//                    //If the sprite is a blackKnight, it is added to the 3d sound filter list
-////                    enemyJumpDistanceFilters.add(new Filter3d(whiteKnight, sprites.get(i), SCREEN_WIDTH));
-//                    enemyJumpDistanceFilters.add(new FadeWithDistanceFilterSound(
-//                            jumpSoundFilepath, whiteKnight, sprites.get(i), SCREEN_WIDTH));
-//                }
-//                else {
-//                    //If the sprite is not a blackKnight, add null to the list as a filter will not be needed for them
-//                    enemyJumpDistanceFilters.add(null);
-//                }
-//            }
 
             level2 = new Level(sprites, spriteIDs, tmap, imgBackground);
             CURRENTLEVEL = 2;
@@ -1390,8 +1349,8 @@ public class Game extends GameCore implements MouseListener {
                                 else
                                     s.setAnimation(blackKnightIdleRight);
 
-                                //Play the 3d sound filter for the given blackKnight
-                                //soundManager.play(jumpSound, enemyJumpDistanceFilters.get(i));
+                                //Play the jump sound at a volume that depends on the proximity of the enemy to the
+                                //player sprite (which may be silent)
                                 new FadeWithDistanceFilterSound(jumpSoundFilepath, whiteKnight,
                                         sprites.get(i), SCREEN_WIDTH).start();
 

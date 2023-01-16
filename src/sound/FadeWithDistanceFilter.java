@@ -3,6 +3,7 @@ package sound;
 import game2D.Sprite;
 
 import java.io.FilterInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Logger;
 
@@ -77,7 +78,8 @@ public class FadeWithDistanceFilter extends FilterInputStream {
         buffer[position+1] = (byte)((sample >> 8) & 0xFF);
     }
 
-    public int read(byte[] samples, int offset, int length) {
+    public int read(byte[] samples, int offset, int length) throws IOException {
+        int bytesRead = super.read(samples,offset,length);
         if(source == null) {
             return length;
         }
@@ -95,7 +97,7 @@ public class FadeWithDistanceFilter extends FilterInputStream {
 
         //Set the volume of the sample
         int shift = 0;
-        for(int i = offset; i < offset + length; i += 2) {
+        for(int i = offset; i < bytesRead; i += 2) {
             float volume = newVolume;
 
             //Shift from the last volume to the new volume so that volume change isn't abrupt
