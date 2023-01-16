@@ -4,6 +4,10 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * The HUD displays the player's health, the current level and
+ * the number of horse shoes collected.
+ */
 public class HUD extends GameCore {
 
     public static final int HUD_POS_X = 10;

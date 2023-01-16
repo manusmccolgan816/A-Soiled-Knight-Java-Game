@@ -3,6 +3,9 @@ package sound;
 import javax.sound.midi.*;
 import java.io.File;
 
+/**
+ * Plays a MIDI track.
+ */
 public class PlayMIDI {
 
     private Sequencer seq;

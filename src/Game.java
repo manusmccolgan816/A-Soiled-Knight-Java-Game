@@ -2,13 +2,10 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 import game2D.*;
 import sound.*;
-
-import javax.sound.sampled.AudioFormat;
 
 /**
  * @author Manus McColgan
@@ -166,7 +163,7 @@ public class Game extends GameCore implements MouseListener {
     }
 
     /**
-     * Starts up the menu, to be called to display menu screen
+     * Starts up the menu, to be called to display menu screen.
      */
     public void initialiseMenu() {
         gameState = STATE.Menu;
@@ -364,7 +361,7 @@ public class Game extends GameCore implements MouseListener {
      * @param s    The Sprite to check collisions for
      * @param tmap The tile map to check
      */
-    public void checkTileCollision(Sprite s, TileMap tmap, ID id) {
+    public void handleTileCollision(Sprite s, TileMap tmap, ID id) {
         boolean reverseVelX = false;
         boolean turnToRight = false;
 
@@ -383,7 +380,7 @@ public class Game extends GameCore implements MouseListener {
         //The same applies to the y coordinate
         int ytile = (int) (sy / tileHeight);
 
-        //What tile character is at the top left of the sprite s?
+        //The tile character at the top left of sprite s
         char ch = tmap.getTileChar(xtile, ytile);
 
         if (ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') { //If it's a ground tile, handle it
@@ -391,25 +388,10 @@ public class Game extends GameCore implements MouseListener {
                 if(id == ID.Player)
                 {
                     if(ch == 's') {
+                        //If the player isn't recovering...
                         if(!isRecovering) {
-                            new Sound(hitHurtSoundFilepath).start();
-
-                            hud.setHealth(hud.getHealth() - 1);
-
-                            if(hud.getHealth() <= 0) {
-                                //Handle death
-                                initialiseGameOver();
-                                return;
-                            }
-                            else {
-                                isRecovering = true;
-                                recoveryTimer = System.nanoTime();
-
-                                if(isFacingRight)
-                                    whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
-                                else
-                                    whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
-                            }
+                            //If the player died, return
+                            if (handleDamageCollision()) return;
                         }
                     }
 
@@ -460,25 +442,10 @@ public class Game extends GameCore implements MouseListener {
                 if(id == ID.Player)
                 {
                     if(ch == 's') {
+                        //If the player isn't recovering...
                         if(!isRecovering) {
-                            new Sound(hitHurtSoundFilepath).start();
-
-                            hud.setHealth(hud.getHealth() - 1);
-
-                            if(hud.getHealth() <= 0) {
-                                //Handle death
-                                initialiseGameOver();
-                                return;
-                            }
-                            else {
-                                isRecovering = true;
-                                recoveryTimer = System.nanoTime();
-
-                                if(isFacingRight)
-                                    whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
-                                else
-                                    whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
-                            }
+                            //If the player died, return
+                            if (handleDamageCollision()) return;
                         }
                     }
 
@@ -530,25 +497,10 @@ public class Game extends GameCore implements MouseListener {
                 if(id == ID.Player)
                 {
                     if(ch == 's') {
+                        //If the player isn't recovering...
                         if(!isRecovering) {
-                            new Sound(hitHurtSoundFilepath).start();
-
-                            hud.setHealth(hud.getHealth() - 1);
-
-                            if(hud.getHealth() <= 0) {
-                                //Handle death
-                                initialiseGameOver();
-                                return;
-                            }
-                            else {
-                                isRecovering = true;
-                                recoveryTimer = System.nanoTime();
-
-                                if(isFacingRight)
-                                    whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
-                                else
-                                    whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
-                            }
+                            //If the player died, return
+                            if (handleDamageCollision()) return;
                         }
                     }
 
@@ -587,24 +539,8 @@ public class Game extends GameCore implements MouseListener {
                 {
                     if(ch == 's') {
                         if(!isRecovering) {
-                            new Sound(hitHurtSoundFilepath).start();
-
-                            hud.setHealth(hud.getHealth() - 1);
-
-                            if(hud.getHealth() <= 0) {
-                                //Handle death
-                                initialiseGameOver();
-                                return;
-                            }
-                            else {
-                                isRecovering = true;
-                                recoveryTimer = System.nanoTime();
-
-                                if(isFacingRight)
-                                    whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
-                                else
-                                    whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
-                            }
+                            //If the player died, return
+                            if (handleDamageCollision()) return;
                         }
                     }
 
@@ -641,24 +577,8 @@ public class Game extends GameCore implements MouseListener {
         if(ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') { //If it's a ground tile, handle it
             if(ch == 's' && id == ID.Player) {
                 if(!isRecovering) {
-                    new Sound(hitHurtSoundFilepath).start();
-
-                    hud.setHealth(hud.getHealth() - 1);
-
-                    if(hud.getHealth() <= 0) {
-                        //Handle death
-                        initialiseGameOver();
-                        return;
-                    }
-                    else {
-                        isRecovering = true;
-                        recoveryTimer = System.nanoTime();
-
-                        if(isFacingRight)
-                            whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
-                        else
-                            whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
-                    }
+                    //If the player died, return
+                    if (handleDamageCollision()) return;
                 }
             }
             if(!isOnGround(s, tmap))
@@ -700,24 +620,8 @@ public class Game extends GameCore implements MouseListener {
         if(ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') { //If it's a ground tile, handle it
             if(ch == 's' && id == ID.Player) {
                 if(!isRecovering) {
-                    new Sound(hitHurtSoundFilepath).start();
-
-                    hud.setHealth(hud.getHealth() - 1);
-
-                    if(hud.getHealth() <= 0) {
-                        //Handle death
-                        initialiseGameOver();
-                        return;
-                    }
-                    else {
-                        isRecovering = true;
-                        recoveryTimer = System.nanoTime();
-
-                        if(isFacingRight)
-                            whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
-                        else
-                            whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
-                    }
+                    //If the player died, return
+                    if (handleDamageCollision()) return;
                 }
             }
             if(!isOnGround(s, tmap)) {
@@ -763,6 +667,40 @@ public class Game extends GameCore implements MouseListener {
         }
     }
 
+    /**
+     * Handles the player taking damage.
+     *
+     * @return true if the player died, false if not
+     */
+    private boolean handleDamageCollision() {
+        new Sound(hitHurtSoundFilepath).start(); //Play the take damage sound
+
+        hud.setHealth(hud.getHealth() - 1); //Lower the player's health by 1
+
+        //If the player is dead...
+        if(hud.getHealth() <= 0) {
+            //Handle death
+            initialiseGameOver();
+            return true;
+        }
+        //If the player is still alive...
+        else {
+            //Start the recovery process
+            isRecovering = true;
+            recoveryTimer = System.nanoTime();
+
+            if(isFacingRight)
+                whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
+            else
+                whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
+        }
+        return false;
+    }
+
+    /**
+     * Loads the next level, setting up sprites, tilemap, background etc.
+     * If there is no next level, the completed screen is displayed.
+     */
     public void goToNextLevel() {
         LinkedList<Sprite> sprites = new LinkedList<>();
         LinkedList<ID> spriteIDs = new LinkedList<>();
@@ -780,7 +718,7 @@ public class Game extends GameCore implements MouseListener {
             Image imgBackground = loadImage("images/RollingHillsResized.png");
 
             //Initialise the HUD, giving the max health for the level and the number of horse shoes to collect
-            hud = new HUD(4, 4, 0, countHorseShoesInMap(tmap));
+            hud = new HUD(5, 5, 0, countHorseShoesInMap(tmap));
 
             //Set the position of the player
             whiteKnight.setPosition(tmap.getTileXC(6, 0), tmap.getTileYC(0, 8));
@@ -832,7 +770,7 @@ public class Game extends GameCore implements MouseListener {
             //Load the background image
             Image imgBackground = loadImage("images/RollingHillsResized.png");
 
-            hud = new HUD(3, 3, 0, countHorseShoesInMap(tmap));
+            hud = new HUD(4, 4, 0, countHorseShoesInMap(tmap));
 
             whiteKnight.setPosition(tmap.getTileXC(4, 0), tmap.getTileYC(0, 17));
             sprites.add(whiteKnight);
@@ -1026,10 +964,6 @@ public class Game extends GameCore implements MouseListener {
 
     }
 
-    public HUD getHud() {
-        return hud;
-    }
-
     class Level extends GameCore {
 
         private final TileMap tmap;
@@ -1178,7 +1112,7 @@ public class Game extends GameCore implements MouseListener {
                         //Assign the previous length of time paused for to lastPauseTimer
                         lastPauseTimer = pauseTimer;
                     }
-                    //'Start' the pause timer
+                    //Start the pause timer
                     pauseTimer = System.nanoTime();
 
                     new Sound(pauseSoundFilepath).start();
@@ -1305,7 +1239,7 @@ public class Game extends GameCore implements MouseListener {
                         }
                         //endregion
 
-                        checkTileCollision(s, tmap, ID.Player);
+                        handleTileCollision(s, tmap, ID.Player);
                     }
                     else if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
                         Random rnd = new Random();
@@ -1358,7 +1292,7 @@ public class Game extends GameCore implements MouseListener {
                         }
                         //endregion
 
-                        checkTileCollision(s, tmap, spriteIDs.get(i));
+                        handleTileCollision(s, tmap, spriteIDs.get(i));
                     }
                     else if(spriteIDs.get(i) == ID.EnemyBlackPawn) {
                         s.update(elapsed);
@@ -1380,7 +1314,7 @@ public class Game extends GameCore implements MouseListener {
                         }
                         //endregion
 
-                        checkTileCollision(s, tmap, spriteIDs.get(i));
+                        handleTileCollision(s, tmap, spriteIDs.get(i));
                     }
                     else if(spriteIDs.get(i) == ID.EnemyBlackRook) {
                         s.update(elapsed);
@@ -1402,7 +1336,7 @@ public class Game extends GameCore implements MouseListener {
                         }
                         //endregion
 
-                        checkTileCollision(s, tmap, spriteIDs.get(i));
+                        handleTileCollision(s, tmap, spriteIDs.get(i));
 
                         if(whiteKnight.getX() + whiteKnight.getWidth() / 2f > s.getX() + s.getWidth() / 2f) {
                             s.setVelocityX(0.075f);
@@ -1420,26 +1354,8 @@ public class Game extends GameCore implements MouseListener {
                                 //region Player on enemy collision
                                 if(!isRecovering) {
                                     if(boundingBoxCollision(s, s2)) {
-                                        new Sound(hitHurtSoundFilepath).start();
-
-                                        HUD h = getHud();
-
-                                        h.setHealth(h.getHealth() - 1);
-
-                                        if(h.getHealth() <= 0) {
-                                            //Handle death
-                                            initialiseGameOver();
-                                            return;
-                                        }
-                                        else {
-                                            isRecovering = true;
-                                            recoveryTimer = System.nanoTime();
-
-                                            if(isFacingRight)
-                                                whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
-                                            else
-                                                whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
-                                        }
+                                        //If the player died, return
+                                        if (handleDamageCollision()) return;
                                     }
                                 }
                                 //endregion

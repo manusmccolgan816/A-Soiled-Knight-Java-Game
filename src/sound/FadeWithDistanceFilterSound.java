@@ -6,15 +6,12 @@ import game2D.Sprite;
 import javax.sound.sampled.*;
 import java.io.File;
 
-public class FadeWithDistanceFilterSound extends Thread {
+public class FadeWithDistanceFilterSound extends Sound {
 
-    private String filename;    // The name of the file to play
-    private boolean finished;    // A flag showing that the thread has finished
-    private Clip clip;
-
-    private Sprite source;
-    private Sprite listener;
-    private int maxDistance;
+    private final String filename;    // The name of the file to play
+    private final Sprite source;
+    private final Sprite listener;
+    private final int maxDistance;
 
     public FadeWithDistanceFilterSound(String fname, Sprite source, Sprite listener, int maxDistance) {
         super(fname);
@@ -23,7 +20,6 @@ public class FadeWithDistanceFilterSound extends Thread {
         this.source = source;
         this.listener = listener;
         this.maxDistance = maxDistance;
-        finished = false;
     }
 
     public void run() {
@@ -36,7 +32,7 @@ public class FadeWithDistanceFilterSound extends Thread {
             AudioInputStream fStream = new AudioInputStream(filtered, format, stream.getFrameLength());
 
             DataLine.Info info = new DataLine.Info(Clip.class, format);
-            clip = (Clip) AudioSystem.getLine(info);
+            Clip clip = (Clip) AudioSystem.getLine(info);
             clip.open(fStream);
             clip.start();
             Thread.sleep(100);
@@ -44,8 +40,7 @@ public class FadeWithDistanceFilterSound extends Thread {
                 Thread.sleep(100);
             }
             clip.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
-        finished = true;
     }
 }

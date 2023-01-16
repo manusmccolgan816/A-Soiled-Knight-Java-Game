@@ -4,7 +4,10 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-
+/**
+ * The GameOver screen is displayed when the player dies. From
+ * here they can return to the menu screen or retry the level.
+ */
 public class GameOver extends GameCore implements MouseListener {
 
     private final Game game;

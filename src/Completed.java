@@ -4,6 +4,10 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+/**
+ * The Completed screen is that which is displayed when the player
+ * completes the game.
+ */
 public class Completed extends GameCore implements MouseListener {
 
     private final Game game;
@@ -39,6 +43,7 @@ public class Completed extends GameCore implements MouseListener {
         //If Quit is clicked...
         if(mouseX >= quitPosX && mouseX <= (quitPosX + imgQuit.getWidth(null)) && mouseY >= quitPosY &&
                 mouseY <= (quitPosY + imgQuit.getHeight(null))) {
+            //Return to the menu screen
             game.initialiseMenu();
         }
     }
