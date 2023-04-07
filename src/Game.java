@@ -2,6 +2,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
 import game2D.*;
@@ -53,6 +55,10 @@ public class Game extends GameCore implements MouseListener {
     private Sprite whiteKnight = null;
 
     private final TileMap tmap = new TileMap();
+    public static final char horseShoeChar = 'e';
+    public static final ArrayList<Character> backgroundChars = new ArrayList<>(
+            Arrays.asList('b', 'm', 't')
+    );
 
     private Menu menu;
     private Controls controls;
@@ -340,7 +346,7 @@ public class Game extends GameCore implements MouseListener {
         char ch = tmap.getTileChar(xtile, ytile);
 
         //If it's a ground tile
-        if (ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') {
+        if (ch != '.' && ch != horseShoeChar && !backgroundChars.contains(ch)) {
             return true;
         }
 
@@ -351,7 +357,7 @@ public class Game extends GameCore implements MouseListener {
         ch = tmap.getTileChar(xtile, ytile);
 
         //Return true if it is a ground tile, false if not
-        return ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't';
+        return ch != '.' && ch != horseShoeChar && !backgroundChars.contains(ch);
     }
 
     /**
@@ -383,7 +389,7 @@ public class Game extends GameCore implements MouseListener {
         //The tile character at the top left of sprite s
         char ch = tmap.getTileChar(xtile, ytile);
 
-        if (ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') { //If it's a ground tile, handle it
+        if (ch != '.' && ch != horseShoeChar && !backgroundChars.contains(ch)) { //If it's a ground tile, handle it
             if(isOnGround(s, tmap) || sx >= tmap.getTileXC(xtile, ytile) + tileWidth - 6) {
                 if(id == ID.Player)
                 {
@@ -418,17 +424,8 @@ public class Game extends GameCore implements MouseListener {
             }
         }
         //If s is the player and collided with a horse shoe
-        else if(ch == 'e' && id == ID.Player) {
-            new Sound(pickupHorseshoeSoundFilepath).start();
-
-            tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
-            hud.incrementHorseShoesCollected();
-
-            if(hud.getNumHorseShoesCollected() == hud.getNumHorseShoes()) {
-                backgroundSong.stop();
-                initialiseGame();
-                goToNextLevel();
-            }
+        else {
+            checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
         }
         //endregion
 
@@ -437,7 +434,7 @@ public class Game extends GameCore implements MouseListener {
         ytile = (int) (sy / tileHeight);
         ch = tmap.getTileChar(xtile, ytile);
 
-        if (ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') { //If it's a ground tile, handle it
+        if (ch != '.' && ch != horseShoeChar && !backgroundChars.contains(ch)) { //If it's a ground tile, handle it
             if(isOnGround(s, tmap) || sx + s.getWidth() <= tmap.getTileXC(xtile, ytile) + 6) {
                 if(id == ID.Player)
                 {
@@ -471,18 +468,7 @@ public class Game extends GameCore implements MouseListener {
             }
         }
         //If s is the player and collided with a horse shoe
-        else if(ch == 'e' && id == ID.Player) {
-            new Sound(pickupHorseshoeSoundFilepath).start();
-
-            tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
-            hud.incrementHorseShoesCollected();
-
-            if(hud.getNumHorseShoesCollected() == hud.getNumHorseShoes()) {
-                backgroundSong.stop();
-                initialiseGame();
-                goToNextLevel();
-            }
-        }
+        else checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
         //endregion
 
         //Just checking the corners will not cover all possible collision areas if s is taller than a tile
@@ -493,7 +479,7 @@ public class Game extends GameCore implements MouseListener {
             ytile = (int) ((sy + (s.getHeight() / 2)) / tileHeight);
             ch = tmap.getTileChar(xtile, ytile);
 
-            if(ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') { //If it's a ground tile, handle it
+            if(ch != '.' && ch != horseShoeChar && !backgroundChars.contains(ch)) { //If it's a ground tile, handle it
                 if(id == ID.Player)
                 {
                     if(ch == 's') {
@@ -515,18 +501,7 @@ public class Game extends GameCore implements MouseListener {
                 s.setX(tmap.getTileXC(xtile, ytile) + tileWidth);
             }
             //If s is the player and collided with a horse shoe
-            else if(ch == 'e' && id == ID.Player) {
-                new Sound(pickupHorseshoeSoundFilepath).start();
-
-                tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
-                hud.incrementHorseShoesCollected();
-
-                if(hud.getNumHorseShoesCollected() == hud.getNumHorseShoes()) {
-                    backgroundSong.stop();
-                    initialiseGame();
-                    goToNextLevel();
-                }
-            }
+            else checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
             //endregion
 
             //region Centre-right collisions
@@ -534,7 +509,7 @@ public class Game extends GameCore implements MouseListener {
             ytile = (int) ((sy + s.getHeight() / 2) / tileHeight);
             ch = tmap.getTileChar(xtile, ytile);
 
-            if(ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') { //If it's a ground tile, handle it
+            if(ch != '.' && ch != horseShoeChar && !backgroundChars.contains(ch)) { //If it's a ground tile, handle it
                 if(id == ID.Player)
                 {
                     if(ch == 's') {
@@ -554,18 +529,7 @@ public class Game extends GameCore implements MouseListener {
                 s.setX(tmap.getTileXC(xtile, ytile) - s.getWidth() - 0.1f);
             }
             //If s is the player and collided with a horse shoe
-            else if(ch == 'e' && id == ID.Player) {
-                new Sound(pickupHorseshoeSoundFilepath).start();
-
-                tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
-                hud.incrementHorseShoesCollected();
-
-                if(hud.getNumHorseShoesCollected() == hud.getNumHorseShoes()) {
-                    backgroundSong.stop();
-                    initialiseGame();
-                    goToNextLevel();
-                }
-            }
+            else checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
             //endregion
         }
 
@@ -574,7 +538,7 @@ public class Game extends GameCore implements MouseListener {
         ytile = (int) ((sy + s.getHeight()) / tileHeight);
         ch = tmap.getTileChar(xtile, ytile);
 
-        if(ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') { //If it's a ground tile, handle it
+        if(ch != '.' && ch != horseShoeChar && !backgroundChars.contains(ch)) { //If it's a ground tile, handle it
             if(ch == 's' && id == ID.Player) {
                 if(!isRecovering) {
                     //If the player died, return
@@ -598,18 +562,7 @@ public class Game extends GameCore implements MouseListener {
             }
         }
         //If s is the player and collided with a horse shoe
-        else if(ch == 'e' && id == ID.Player) {
-            new Sound(pickupHorseshoeSoundFilepath).start();
-
-            tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
-            hud.incrementHorseShoesCollected();
-
-            if(hud.getNumHorseShoesCollected() == hud.getNumHorseShoes()) {
-                backgroundSong.stop();
-                initialiseGame();
-                goToNextLevel();
-            }
-        }
+        else checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
         //endregion
 
         //region Bottom-right collisions
@@ -617,7 +570,7 @@ public class Game extends GameCore implements MouseListener {
         ytile = (int) ((sy + s.getHeight()) / tileHeight);
         ch = tmap.getTileChar(xtile, ytile);
 
-        if(ch != '.' && ch != 'e' && ch != 'b' && ch != 'm' && ch != 't') { //If it's a ground tile, handle it
+        if(ch != '.' && ch != horseShoeChar && !backgroundChars.contains(ch)) { //If it's a ground tile, handle it
             if(ch == 's' && id == ID.Player) {
                 if(!isRecovering) {
                     //If the player died, return
@@ -639,18 +592,7 @@ public class Game extends GameCore implements MouseListener {
             }
         }
         //If s is the player and collided with a horse shoe
-        else if(ch == 'e' && id == ID.Player) {
-            new Sound(pickupHorseshoeSoundFilepath).start();
-
-            tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
-            hud.incrementHorseShoesCollected();
-
-            if(hud.getNumHorseShoesCollected() == hud.getNumHorseShoes()) {
-                backgroundSong.stop();
-                initialiseGame();
-                goToNextLevel();
-            }
-        }
+        else checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
         //endregion
 
         if(reverseVelX) {
@@ -663,6 +605,21 @@ public class Game extends GameCore implements MouseListener {
                 else {
                     s.setAnimation(blackKnightBobbingLeft);
                 }
+            }
+        }
+    }
+
+    private void checkHandleHorseShoeCollision(TileMap tmap, ID id, int xtile, int ytile, char ch) {
+        if(ch == horseShoeChar && id == ID.Player) {
+            new Sound(pickupHorseshoeSoundFilepath).start();
+
+            tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
+            hud.incrementHorseShoesCollected();
+
+            if(hud.getNumHorseShoesCollected() == hud.getNumHorseShoes()) {
+                backgroundSong.stop();
+                initialiseGame();
+                goToNextLevel();
             }
         }
     }
@@ -931,7 +888,7 @@ public class Game extends GameCore implements MouseListener {
                 tileChar = tmap.getTileChar(i, j);
 
                 //Increment numHorseShoes if a horse shoe is found
-                if(tileChar == 'e')
+                if(tileChar == horseShoeChar)
                     numHorseShoes++;
             }
         }
@@ -1173,6 +1130,12 @@ public class Game extends GameCore implements MouseListener {
                 }
                 for(int i = 0; i < sprites.size(); i++) {
                     Sprite s = sprites.get(i);
+
+                    // Skip this sprite if it is far outside the viewable area
+                    if (s.getX() > whiteKnight.getX() + SCREEN_WIDTH * 2
+                            || s.getX() < whiteKnight.getX() - SCREEN_WIDTH * 2) {
+                        continue;
+                    }
 
                     if(spriteIDs.get(i) == ID.Player) {
                         s.update(elapsed);

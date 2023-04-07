@@ -100,7 +100,7 @@ public class FadeWithDistanceFilter extends FilterInputStream {
             setSample(samples, i, newSample);
         }
         lastVolume = newVolume;
-        LOGGER.info("Volume is " + lastVolume);
+        //LOGGER.info("Volume is " + lastVolume);
 
         return length;
     }
