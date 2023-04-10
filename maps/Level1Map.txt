@@ -11,6 +11,7 @@
 #m=CastlePillarMiddleResized.png
 #t=CastlePillarTopResized.png
 #e=HorseShoeTileResized.png
+#h=FilledHeart.png
 #map
 wwwwwwwwwwwwww.................................................................wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 wwwwwwwwwwwwww.................................................................wwwwwwwwwwwwwwwwwwww........................................w
@@ -18,7 +19,7 @@ wwwwwwwwwwwwww.........................................e.......................w
 wwwwwwwwwwwwww.........................................w.......................wwwwwwwwwwwwwwwwwwww........................................w
 wwwwwwwwwwwwww.................................................................wwwwwwwwwwwwwwwwwwww.......................................ew
 w.t.........t........................................w..........................t................t...........wwwwwwwwwwwww...w..w..w...wwwww
-w.m.........m.............e......................w.....................w........m.......e........m..........wwwwwwwwwwwwwwssswsswsswssswwwww
+w.m.........m.............e...............h......w.....................w........m.......e........m......h...wwwwwwwwwwwwwwssswsswsswssswwwww
 w.m.........m.........wwwwwwww..wwwww..................................w...w....m................m.........wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 w.b.........b.......wwwwwwwwwwsswwwww..........w......................wwssswww..b.w............w.b..s.....wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww

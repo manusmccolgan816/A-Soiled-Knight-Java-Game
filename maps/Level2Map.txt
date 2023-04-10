@@ -5,13 +5,14 @@
 #m=CastlePillarMiddleResized.png
 #t=CastlePillarTopResized.png
 #e=HorseShoeTileResized.png
+#h=FilledHeart.png
 #map
 w.......wwwwww................................................www
 w.......wwwwww................................................www
 w.......wwwwwwe...............................................www
 w.......wwwwwwww..............................................www
 w.......wwwwwwwww.........w...................................www
-w.......wwwwwwwwwwwwwwwwwwwwww................................www
+w.......wwwwwwwwwwwwwwwwwwwwww...............................hwww
 w.......wwwwww................................................www
 w.......wwwwww.................ww.............................www
 w.......wwwwww.....................w..........................www
