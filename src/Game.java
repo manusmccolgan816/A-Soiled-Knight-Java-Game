@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.logging.Logger;
+
 import game2D.*;
 import sound.*;
 
@@ -77,6 +79,7 @@ public class Game extends GameCore implements MouseListener {
     private final String jumpSoundFilepath = "sounds/jump16bit.wav";
     private final String hitHurtSoundFilepath = "sounds/hitHurt16bit.wav";
     private final String pickupHorseshoeSoundFilepath = "sounds/pickupHorseshoe16bit.wav";
+    private final String healthUpSoundFilepath = "sounds/healthUp16bit.wav";
     private final String pauseSoundFilepath = "sounds/pause16bit.wav";
 
     /**
@@ -645,12 +648,14 @@ public class Game extends GameCore implements MouseListener {
 
     private void checkHandleHeartCollision(TileMap tmap, ID id, int xtile, int ytile, char ch) {
         if (ch == heartChar && id == ID.Player) {
+            new Sound(healthUpSoundFilepath).start();
+
+            tmap.setTileChar('.', xtile, ytile);
+
             int health = hud.getHealth();
             if (health < hud.getMaxHealth()) {
                 hud.setHealth(health + 1);
             }
-
-            tmap.setTileChar('.', xtile, ytile);
         }
     }
 
