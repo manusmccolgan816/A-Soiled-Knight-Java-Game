@@ -980,7 +980,7 @@ public class Game extends GameCore implements MouseListener {
 
             boolean screenScrolling;
 
-            g.setColor(new Color(240, 246, 240)); //Sets the background colour
+            g.setColor(ColourRepository.WHITE); //Sets the background colour
             g.fillRect(getInsets().left, getInsets().top, SCREEN_WIDTH, SCREEN_HEIGHT);
 
             for (int i = 0; i < sprites.size(); i++) {

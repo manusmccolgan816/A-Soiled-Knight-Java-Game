@@ -49,17 +49,24 @@ public class HUD extends GameCore {
             nextHeartX += imgEmptyHeart.getWidth(null) + 10;
         }
 
-        //Displaying level number
-        g.setColor(new Color(34, 35, 35));
+        g.setColor(ColourRepository.WHITE);
+        g.fillRect(nextHeartX + 5, HUD_POS_Y + 5, 165, 50);
+
+        //Display level number
+        g.setColor(ColourRepository.BLACK);
         g.drawString("Level: " + Game.currentLevel, nextHeartX + 10, nextHeartY + 10);
 
-        //Displaying horse shoe info
+        //Display horse shoe info
         g.drawString("Horse shoes collected: " + numHorseShoesCollected + "/" + numHorseShoes, nextHeartX + 10, nextHeartY + 30);
 
         if (Game.isDebugModeOn) {
+            g.setColor(ColourRepository.WHITE);
+            g.fillRect(nextHeartX + 5, HUD_POS_Y + 50, 165, 65);
+
             g.setColor(Color.RED);
             g.drawString("x: " + game.getWhiteKnight().getX(), nextHeartX + 10, nextHeartY + 50);
             g.drawString("y: " + game.getWhiteKnight().getY(), nextHeartX + 10, nextHeartY + 70);
+            g.drawString("FPS: " + game.getFPS(), nextHeartX + 10, nextHeartY + 90);
         }
     }
 
