@@ -10,10 +10,6 @@ import java.util.Random;
 import game2D.*;
 import sound.*;
 
-/**
- * @author Manus McColgan
- */
-
 public class Game extends GameCore implements MouseListener {
 
     //Dimensions are 4 times that of a Game Boy display
@@ -22,6 +18,7 @@ public class Game extends GameCore implements MouseListener {
 
     public STATE gameState;
     public static int currentLevel = 0; //When this is 0, no level is being played
+    public static boolean isDebugModeOn = false;
 
     private final float gravity = 0.002f;
 
@@ -267,25 +264,20 @@ public class Game extends GameCore implements MouseListener {
      * @param g The Graphics2D object to draw with
      */
     public void draw(Graphics2D g) {
-        if(gameState == STATE.Menu) {
+        if (gameState == STATE.Menu) {
             menu.draw(g);
-        }
-        else if(gameState == STATE.Controls) {
+        } else if (gameState == STATE.Controls) {
             controls.draw(g);
-        }
-        else if(gameState == STATE.Game) {
-            if(currentLevel == 1) {
+        } else if (gameState == STATE.Game) {
+            if (currentLevel == 1) {
                 level1.draw(g);
-            }
-            else if(currentLevel == 2) {
+            } else if (currentLevel == 2) {
                 level2.draw(g);
             }
             hud.draw(g);
-        }
-        else if(gameState == STATE.GameOver) {
+        } else if (gameState == STATE.GameOver) {
             gameOver.draw(g);
-        }
-        else if(gameState == STATE.Completed) {
+        } else if (gameState == STATE.Completed) {
             completed.draw(g);
         }
     }
@@ -296,21 +288,17 @@ public class Game extends GameCore implements MouseListener {
      * @param elapsed The elapsed time between this call and the previous call of elapsed
      */
     public void update(long elapsed) {
-        if(gameState == STATE.Menu) {
+        if (gameState == STATE.Menu) {
             menu.update(elapsed);
-        }
-        else if(gameState == STATE.Game) {
-            if(currentLevel == 1) {
+        } else if (gameState == STATE.Game) {
+            if (currentLevel == 1) {
                 level1.update(elapsed);
-            }
-            else if(currentLevel == 2) {
+            } else if (currentLevel == 2) {
                 level2.update(elapsed);
             }
-        }
-        else if (gameState == STATE.GameOver) {
+        } else if (gameState == STATE.GameOver) {
             gameOver.update(elapsed);
-        }
-        else if(gameState == STATE.Completed) {
+        } else if (gameState == STATE.Completed) {
             completed.update(elapsed);
         }
     }
@@ -318,9 +306,9 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Returns true if s1's bounding box collides with s2's bounding box.
      *
-     * @param s1    the first sprite
-     * @param s2    the second sprite
-     * @return      true if collision occurred
+     * @param s1 the first sprite
+     * @param s2 the second sprite
+     * @return true if collision occurred
      */
     public boolean boundingBoxCollision(Sprite s1, Sprite s2) {
         return ((s1.getX() + s1.getImage().getWidth(null) > s2.getX()) &&
@@ -334,7 +322,7 @@ public class Game extends GameCore implements MouseListener {
      *
      * @param s    The sprite to check
      * @param tMap The tilemap to check
-     * @return     true if s is on a ground tile
+     * @return true if s is on a ground tile
      */
     public boolean isOnGround(Sprite s, TileMap tMap) {
         //Take a note of a sprite's current position
@@ -396,11 +384,11 @@ public class Game extends GameCore implements MouseListener {
         char ch = tMap.getTileChar(xTile, yTile);
 
         if (!backgroundChars.contains(ch)) {
-            if(isOnGround(s, tMap) || sx >= tMap.getTileXC(xTile, yTile) + tileWidth - 6) {
-                if(id == ID.Player) {
-                    if(damageChars.contains(ch)) {
+            if (isOnGround(s, tMap) || sx >= tMap.getTileXC(xTile, yTile) + tileWidth - 6) {
+                if (id == ID.Player) {
+                    if (damageChars.contains(ch)) {
                         //If the player isn't recovering...
-                        if(!isRecovering) {
+                        if (!isRecovering) {
                             //If the player died, return
                             if (handleDamageCollision()) return;
                         }
@@ -408,8 +396,7 @@ public class Game extends GameCore implements MouseListener {
 
                     //Stop horizontal movement
                     s.setVelocityX(0);
-                }
-                else {
+                } else {
                     reverseVelX = true;
                     turnToRight = true;
                 }
@@ -441,12 +428,11 @@ public class Game extends GameCore implements MouseListener {
         ch = tMap.getTileChar(xTile, yTile);
 
         if (!backgroundChars.contains(ch)) {
-            if(isOnGround(s, tMap) || sx + s.getWidth() <= tMap.getTileXC(xTile, yTile) + 6) {
-                if(id == ID.Player)
-                {
-                    if(damageChars.contains(ch)) {
+            if (isOnGround(s, tMap) || sx + s.getWidth() <= tMap.getTileXC(xTile, yTile) + 6) {
+                if (id == ID.Player) {
+                    if (damageChars.contains(ch)) {
                         //If the player isn't recovering...
-                        if(!isRecovering) {
+                        if (!isRecovering) {
                             //If the player died, return
                             if (handleDamageCollision()) return;
                         }
@@ -454,12 +440,11 @@ public class Game extends GameCore implements MouseListener {
 
                     //Stop horizontal movement
                     s.setVelocityX(0);
-                }
-                else {
+                } else {
                     reverseVelX = true;
                 }
 
-                xTile = (int) ((sx + s.getWidth())  / tileWidth);
+                xTile = (int) ((sx + s.getWidth()) / tileWidth);
                 yTile = (int) ((sy + s.getHeight()) / tileHeight);
                 //Move s just out of the tile it moved into so there is no overlap
                 s.setX(tMap.getTileXC(xTile, yTile) - s.getWidth() - 0.1f);
@@ -481,19 +466,18 @@ public class Game extends GameCore implements MouseListener {
         //endregion
 
         //Just checking the corners will not cover all possible collision areas if s is taller than a tile
-        if(s.getHeight() > tileHeight) {
+        if (s.getHeight() > tileHeight) {
             //region Centre-left collisions
             //yTile is the middle y point of s so that it doesn't detect ground collisions
             xTile = (int) (sx / tileWidth);
             yTile = (int) ((sy + (s.getHeight() / 2)) / tileHeight);
             ch = tMap.getTileChar(xTile, yTile);
 
-            if(!backgroundChars.contains(ch)) {
-                if(id == ID.Player)
-                {
-                    if(damageChars.contains(ch)) {
+            if (!backgroundChars.contains(ch)) {
+                if (id == ID.Player) {
+                    if (damageChars.contains(ch)) {
                         //If the player isn't recovering...
-                        if(!isRecovering) {
+                        if (!isRecovering) {
                             //If the player died, return
                             if (handleDamageCollision()) return;
                         }
@@ -501,8 +485,7 @@ public class Game extends GameCore implements MouseListener {
 
                     //Stop horizontal movement
                     s.setVelocityX(0);
-                }
-                else {
+                } else {
                     reverseVelX = true;
                     turnToRight = true;
                 }
@@ -517,15 +500,14 @@ public class Game extends GameCore implements MouseListener {
             //endregion
 
             //region Centre-right collisions
-            xTile = (int) ((sx + s.getWidth())  / tileWidth);
+            xTile = (int) ((sx + s.getWidth()) / tileWidth);
             yTile = (int) ((sy + s.getHeight() / 2) / tileHeight);
             ch = tMap.getTileChar(xTile, yTile);
 
-            if(!backgroundChars.contains(ch)) {
-                if(id == ID.Player)
-                {
-                    if(damageChars.contains(ch)) {
-                        if(!isRecovering) {
+            if (!backgroundChars.contains(ch)) {
+                if (id == ID.Player) {
+                    if (damageChars.contains(ch)) {
+                        if (!isRecovering) {
                             //If the player died, return
                             if (handleDamageCollision()) return;
                         }
@@ -533,8 +515,7 @@ public class Game extends GameCore implements MouseListener {
 
                     //Stop horizontal movement
                     s.setVelocityX(0);
-                }
-                else {
+                } else {
                     reverseVelX = true;
                 }
                 //Moves s just out of the tile it moved into so there is no overlap
@@ -553,21 +534,18 @@ public class Game extends GameCore implements MouseListener {
         yTile = (int) ((sy + s.getHeight()) / tileHeight);
         ch = tMap.getTileChar(xTile, yTile);
 
-        if(!backgroundChars.contains(ch)) {
-            if(damageChars.contains(ch) && id == ID.Player) {
-                if(!isRecovering) {
+        if (!backgroundChars.contains(ch)) {
+            if (damageChars.contains(ch) && id == ID.Player) {
+                if (!isRecovering) {
                     //If the player died, return
                     if (handleDamageCollision()) return;
                 }
             }
-            if(!isOnGround(s, tMap))
-            {
-                if(id == ID.Player)
-                {
+            if (!isOnGround(s, tMap)) {
+                if (id == ID.Player) {
                     //Stop horizontal movement
                     s.setVelocityX(0);
-                }
-                else {
+                } else {
                     reverseVelX = true;
                     turnToRight = true;
                 }
@@ -584,24 +562,22 @@ public class Game extends GameCore implements MouseListener {
         //endregion
 
         //region Bottom-right collisions
-        xTile = (int) ((sx + s.getWidth())  / tileWidth);
+        xTile = (int) ((sx + s.getWidth()) / tileWidth);
         yTile = (int) ((sy + s.getHeight()) / tileHeight);
         ch = tMap.getTileChar(xTile, yTile);
 
-        if(!backgroundChars.contains(ch)) {
-            if(damageChars.contains(ch) && id == ID.Player) {
-                if(!isRecovering) {
+        if (!backgroundChars.contains(ch)) {
+            if (damageChars.contains(ch) && id == ID.Player) {
+                if (!isRecovering) {
                     //If the player died, return
                     if (handleDamageCollision()) return;
                 }
             }
-            if(!isOnGround(s, tMap)) {
-                if(id == ID.Player)
-                {
+            if (!isOnGround(s, tMap)) {
+                if (id == ID.Player) {
                     //Stop horizontal movement
                     s.setVelocityX(0);
-                }
-                else {
+                } else {
                     reverseVelX = true;
                 }
 
@@ -616,14 +592,13 @@ public class Game extends GameCore implements MouseListener {
         }
         //endregion
 
-        if(reverseVelX) {
+        if (reverseVelX) {
             s.setVelocityX(-s.getVelocityX()); //Reverse the sprite's movement
 
-            if(id == ID.EnemyBlackKnight) {
-                if(turnToRight) {
+            if (id == ID.EnemyBlackKnight) {
+                if (turnToRight) {
                     s.setAnimation(blackKnightBobbingRight);
-                }
-                else {
+                } else {
                     s.setAnimation(blackKnightBobbingLeft);
                 }
             }
@@ -631,13 +606,13 @@ public class Game extends GameCore implements MouseListener {
     }
 
     private void checkHandleHorseShoeCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
-        if(ch == horseShoeChar && id == ID.Player) {
+        if (ch == horseShoeChar && id == ID.Player) {
             new Sound(pickupHorseshoeSoundFilepath).start();
 
             tMap.setTileChar('.', xTile, yTile); //Change the horse shoe to empty space
             hud.incrementHorseShoesCollected();
 
-            if(hud.getNumHorseShoesCollected() == hud.getNumHorseShoes()) {
+            if (hud.getNumHorseShoesCollected() == hud.getNumHorseShoes()) {
                 backgroundSong.stop();
                 initialiseGame();
                 goToNextLevel();
@@ -669,7 +644,7 @@ public class Game extends GameCore implements MouseListener {
         hud.setHealth(hud.getHealth() - 1); //Lower the player's health by 1
 
         //If the player is dead...
-        if(hud.getHealth() <= 0) {
+        if (hud.getHealth() <= 0) {
             //Handle death
             initialiseGameOver();
             return true;
@@ -680,7 +655,7 @@ public class Game extends GameCore implements MouseListener {
             isRecovering = true;
             recoveryTimer = System.nanoTime();
 
-            if(isFacingRight)
+            if (isFacingRight)
                 whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
             else
                 whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
@@ -701,7 +676,7 @@ public class Game extends GameCore implements MouseListener {
         removeMouseListener(controls);
 
         //If there is no current level...
-        if(currentLevel == 0) {
+        if (currentLevel == 0) {
             //Load the tile map
             tMap.loadMap("maps", "Level1Map.txt");
 
@@ -709,7 +684,7 @@ public class Game extends GameCore implements MouseListener {
             Image imgBackground = loadImage("images/RollingHillsResized.png");
 
             //Initialise the HUD, giving the max health for the level and the number of horse shoes to collect
-            hud = new HUD(4, 4, 0, countHorseShoesInMap(tMap));
+            hud = new HUD(this,4, 4, 0, countHorseShoesInMap(tMap));
 
             //Set the position of the player
             whiteKnight.setPosition(tMap.getTileXC(6, 0), tMap.getTileYC(0, 8));
@@ -753,15 +728,14 @@ public class Game extends GameCore implements MouseListener {
 
             level1 = new Level(sprites, spriteIDs, tMap, imgBackground);
             currentLevel = 1;
-        }
-        else if(currentLevel == 1) {
+        } else if (currentLevel == 1) {
             //Load the tile map
             tMap.loadMap("maps", "Level2Map.txt");
 
             //Load the background image
             Image imgBackground = loadImage("images/RollingHillsResized.png");
 
-            hud = new HUD(4, 4, 0, countHorseShoesInMap(tMap));
+            hud = new HUD(this,4, 4, 0, countHorseShoesInMap(tMap));
 
             whiteKnight.setPosition(tMap.getTileXC(4, 0), tMap.getTileYC(0, 17));
             sprites.add(whiteKnight);
@@ -809,8 +783,7 @@ public class Game extends GameCore implements MouseListener {
 
             level2 = new Level(sprites, spriteIDs, tMap, imgBackground);
             currentLevel = 2;
-        }
-        else {
+        } else {
             initialiseCompleted();
             return;
         }
@@ -823,34 +796,36 @@ public class Game extends GameCore implements MouseListener {
      * @param e The event that has been generated
      */
     public void keyPressed(KeyEvent e) {
-        if(gameState != STATE.Game) return;
+        if (gameState != STATE.Game) return;
 
         int key = e.getKeyCode();
 
-        if(key == KeyEvent.VK_P) {
-            if(isPaused) {
+        if (key == KeyEvent.VK_P) {
+            if (isPaused) {
                 isPaused = false;
                 isJustResumed = true;
-            }
-            else {
+            } else {
                 isPaused = true;
                 isJustPaused = true;
             }
         }
+        else if (key == KeyEvent.VK_M) {
+            isDebugModeOn = !isDebugModeOn;
+        }
 
-        if(isPaused) return;
+        if (isPaused) return;
 
-        if(key == KeyEvent.VK_A) {
+        if (key == KeyEvent.VK_A) {
             aPressed = true;
         }
-        if(key == KeyEvent.VK_D) {
+        if (key == KeyEvent.VK_D) {
             dPressed = true;
         }
-        if(key == KeyEvent.VK_SPACE) {
+        if (key == KeyEvent.VK_SPACE) {
             spacePressed = true;
         }
 
-        if(aPressed && dPressed) {
+        if (aPressed && dPressed) {
             whiteKnight.setVelocityX(0);
         }
     }
@@ -861,29 +836,29 @@ public class Game extends GameCore implements MouseListener {
      * @param e The event that has been generated
      */
     public void keyReleased(KeyEvent e) {
-        if(gameState != STATE.Game) return;
+        if (gameState != STATE.Game) return;
         int key = e.getKeyCode();
 
-        if(isPaused) return;
+        if (isPaused) return;
 
-        if(key == KeyEvent.VK_A) {
-            if(isRecovering) whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
+        if (key == KeyEvent.VK_A) {
+            if (isRecovering) whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
             else whiteKnight.setAnimation(whiteKnightIdleLeft);
             aPressed = false;
         }
-        if(key == KeyEvent.VK_D) {
-            if(isRecovering) whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
+        if (key == KeyEvent.VK_D) {
+            if (isRecovering) whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
             else whiteKnight.setAnimation(whiteKnightIdleRight);
             dPressed = false;
         }
-        if(key == KeyEvent.VK_SPACE) {
+        if (key == KeyEvent.VK_SPACE) {
 
             spacePressed = false;
             //The space key must be released before the player can jump again
             canJump = true;
         }
 
-        if(!aPressed && !dPressed) {
+        if (!aPressed && !dPressed) {
             whiteKnight.setVelocityX(0);
         }
     }
@@ -897,7 +872,7 @@ public class Game extends GameCore implements MouseListener {
      * @return the greater value, either min or the lesser value of max and val
      */
     public static float clamp(float val, float min, float max) {
-        if(val >= max)
+        if (val >= max)
             return max;
         else return Math.max(val, min);
     }
@@ -914,17 +889,21 @@ public class Game extends GameCore implements MouseListener {
         char tileChar;
         int numHorseShoes = 0;
 
-        for(int i = 0; i < mapWidth; i++) {
-            for(int j = 0; j < mapHeight; j++) {
+        for (int i = 0; i < mapWidth; i++) {
+            for (int j = 0; j < mapHeight; j++) {
                 tileChar = tMap.getTileChar(i, j);
 
                 //Increment numHorseShoes if a horse shoe is found
-                if(tileChar == horseShoeChar)
+                if (tileChar == horseShoeChar)
                     numHorseShoes++;
             }
         }
 
         return numHorseShoes;
+    }
+
+    public Sprite getWhiteKnight() {
+        return whiteKnight;
     }
 
     @Override
@@ -1004,10 +983,10 @@ public class Game extends GameCore implements MouseListener {
             g.setColor(new Color(240, 246, 240)); //Sets the background colour
             g.fillRect(getInsets().left, getInsets().top, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-            for(int i = 0; i < sprites.size(); i++) {
+            for (int i = 0; i < sprites.size(); i++) {
                 Sprite s = sprites.get(i);
 
-                if(spriteIDs.get(i) == ID.Player) {
+                if (spriteIDs.get(i) == ID.Player) {
                     //Adjusts the x offset so that the player is to the left of the centre of the screen
                     xOffset = (int) (-s.getX()) + (SCREEN_WIDTH / 2) - s.getWidth();
                     //Ensures that the screen does not scroll past the bounds of the map
@@ -1035,37 +1014,37 @@ public class Game extends GameCore implements MouseListener {
                     g.drawImage(imgBackground, (int) backgroundX2, 0, null);
 
                     //If the screen is scrolling and the player is moving left...
-                    if(screenScrolling && s.getVelocityX() < 0) {
+                    if (screenScrolling && s.getVelocityX() < 0) {
                         //...move both background images to the right
                         backgroundX = backgroundX + 0.75f;
                         backgroundX2 = backgroundX2 + 0.75f;
 
                         //If the first background image is not visible and is to the right of the screen by over 10
                         //pixels...
-                        if(backgroundX > SCREEN_WIDTH + 10) {
+                        if (backgroundX > SCREEN_WIDTH + 10) {
                             //...place it to the left of the second background image
                             backgroundX = backgroundX2 - backgroundWidth;
                         }
                         //If the second background image is not visible and is to the right of the screen by over 10
                         //pixels...
-                        else if(backgroundX2 > SCREEN_WIDTH + 10) {
+                        else if (backgroundX2 > SCREEN_WIDTH + 10) {
                             //...place it to the left of the first background image
                             backgroundX2 = backgroundX - backgroundWidth;
                         }
                     }
                     //If the screen is scrolling and the player is moving right...
-                    else if(screenScrolling && s.getVelocityX() > 0) {
+                    else if (screenScrolling && s.getVelocityX() > 0) {
                         //...move both background images to the left
                         backgroundX = backgroundX - 1;
                         backgroundX2 = backgroundX2 - 1;
 
                         //If the first background image is not visible and is to the left of the screen...
-                        if(backgroundX < -backgroundWidth) {
+                        if (backgroundX < -backgroundWidth) {
                             //...place it to the right of the second background image
                             backgroundX = backgroundX2 + backgroundWidth;
                         }
                         //If the second background image is not visible and is to the left of the screen...
-                        else if(backgroundX2 < -backgroundWidth) {
+                        else if (backgroundX2 < -backgroundWidth) {
                             //...place it to the right of the first background image
                             backgroundX2 = backgroundX + backgroundWidth;
                         }
@@ -1085,18 +1064,18 @@ public class Game extends GameCore implements MouseListener {
                 }
             }
 
-            if(isPaused) {
+            if (isPaused) {
                 g.drawImage(loadImage("images/PauseScreenResized.png"), 0, 0, null);
             }
         }
 
         @Override
         public void update(long elapsed) {
-            if(isPaused) {
+            if (isPaused) {
                 //If this is the first call of Level.update() since the pause button was pressed...
-                if(isJustPaused) {
+                if (isJustPaused) {
                     //If the game is being paused for the second (third, ... onward) time during the same recovery...
-                    if(isRecovering && pauseTimer != 0) {
+                    if (isRecovering && pauseTimer != 0) {
                         //Assign the previous length of time paused for to lastPauseTimer
                         lastPauseTimer = pauseTimer;
                     }
@@ -1107,12 +1086,11 @@ public class Game extends GameCore implements MouseListener {
                     backgroundSong.stop();
 
                     //Set whiteKnight's animation back to what it should be
-                    if(aPressed) {
-                        if(isRecovering) whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
+                    if (aPressed) {
+                        if (isRecovering) whiteKnight.setAnimation(whiteKnightRecoveringIdleLeft);
                         else whiteKnight.setAnimation(whiteKnightIdleLeft);
-                    }
-                    else if(dPressed) {
-                        if(isRecovering) whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
+                    } else if (dPressed) {
+                        if (isRecovering) whiteKnight.setAnimation(whiteKnightRecoveringIdleRight);
                         else whiteKnight.setAnimation(whiteKnightIdleRight);
                     }
 
@@ -1121,7 +1099,7 @@ public class Game extends GameCore implements MouseListener {
                     spacePressed = false;
                     canJump = true;
 
-                    for(int i = 0; i < sprites.size(); i++) {
+                    for (int i = 0; i < sprites.size(); i++) {
                         //Store the x and y velocity of the sprite before stopping it
                         spriteVelocities[0][i] = sprites.get(i).getVelocityX();
                         spriteVelocities[1][i] = sprites.get(i).getVelocityY();
@@ -1134,10 +1112,9 @@ public class Game extends GameCore implements MouseListener {
                         isJustPaused = false;
                     }
                 }
-            }
-            else {
+            } else {
                 //If this is the first call of Level.update() since the resume button was pressed...
-                if(isJustResumed) {
+                if (isJustResumed) {
                     //Get the time paused for
                     pauseTimer = (System.nanoTime() - pauseTimer);
                     //Add the previous time(s) paused for to pauseTimer
@@ -1145,11 +1122,10 @@ public class Game extends GameCore implements MouseListener {
 
                     backgroundSong.resume();
 
-                    for(int i = 0; i < sprites.size(); i++) {
-                        if(spriteIDs.get(i) == ID.Player) {
+                    for (int i = 0; i < sprites.size(); i++) {
+                        if (spriteIDs.get(i) == ID.Player) {
                             sprites.get(i).setVelocity(0, spriteVelocities[1][i]);
-                        }
-                        else {
+                        } else {
                             //Set the x and y velocity of the sprite to what they were before pausing
                             sprites.get(i).setVelocity(spriteVelocities[0][i], spriteVelocities[1][i]);
                         }
@@ -1159,7 +1135,7 @@ public class Game extends GameCore implements MouseListener {
                         isJustResumed = false;
                     }
                 }
-                for(int i = 0; i < sprites.size(); i++) {
+                for (int i = 0; i < sprites.size(); i++) {
                     Sprite s = sprites.get(i);
 
                     // Skip this sprite if it is far outside the viewable area
@@ -1168,11 +1144,11 @@ public class Game extends GameCore implements MouseListener {
                         continue;
                     }
 
-                    if(spriteIDs.get(i) == ID.Player) {
+                    if (spriteIDs.get(i) == ID.Player) {
                         s.update(elapsed);
 
                         //region Gravity and ground collision
-                        if(isOnGround(s, tMap) && s.getVelocityY() >= 0) {
+                        if (isOnGround(s, tMap) && s.getVelocityY() >= 0) {
                             //Stops whiteKnight from falling
                             s.setVelocityY(0);
 
@@ -1181,8 +1157,7 @@ public class Game extends GameCore implements MouseListener {
 
                             //Moves whiteKnight just out of the tile it landed on so there is no overlap
                             s.setY(tMap.getTileYC(0, yTile) - s.getHeight());
-                        }
-                        else {
+                        } else {
                             //Makes whiteKnight fall
                             s.setVelocityY(s.getVelocityY() + gravity * elapsed);
                         }
@@ -1190,15 +1165,14 @@ public class Game extends GameCore implements MouseListener {
 
                         //region Movement
                         //Handles left movement
-                        if(aPressed && !dPressed) {
+                        if (aPressed && !dPressed) {
                             s.setAnimation(whiteKnightBobbingLeft);
                             isFacingRight = false;
-                            if(isRecovering) s.setAnimation(whiteKnightRecoveringIdleLeft);
+                            if (isRecovering) s.setAnimation(whiteKnightRecoveringIdleLeft);
                             else {
-                                if(isOnGround(s, tMap)) {
+                                if (isOnGround(s, tMap)) {
                                     s.setAnimation(whiteKnightBobbingLeft);
-                                }
-                                else {
+                                } else {
                                     s.setAnimation(whiteKnightIdleLeft);
                                 }
                             }
@@ -1206,15 +1180,14 @@ public class Game extends GameCore implements MouseListener {
                             s.setVelocityX(-0.3f);
                         }
                         //Handles right movement
-                        else if(!aPressed && dPressed) {
+                        else if (!aPressed && dPressed) {
                             s.setAnimation(whiteKnightBobbingRight);
                             isFacingRight = true;
-                            if(isRecovering) s.setAnimation(whiteKnightRecoveringIdleRight);
+                            if (isRecovering) s.setAnimation(whiteKnightRecoveringIdleRight);
                             else {
-                                if(isOnGround(s, tMap)) {
+                                if (isOnGround(s, tMap)) {
                                     s.setAnimation(whiteKnightBobbingRight);
-                                }
-                                else {
+                                } else {
                                     s.setAnimation(whiteKnightIdleRight);
                                 }
                             }
@@ -1224,7 +1197,7 @@ public class Game extends GameCore implements MouseListener {
                         //endregion
 
                         //region Jumping
-                        if(spacePressed && isOnGround(s, tMap) && canJump) {
+                        if (spacePressed && isOnGround(s, tMap) && canJump) {
                             canJump = false;
                             //s jumps
                             s.setVelocityY(clamp((s.getVelocityY() + 0.1f) * -7.5f, -3, 0));
@@ -1234,14 +1207,13 @@ public class Game extends GameCore implements MouseListener {
                         //endregion
 
                         handleTileCollision(s, tMap, ID.Player);
-                    }
-                    else if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
+                    } else if (spriteIDs.get(i) == ID.EnemyBlackKnight) {
                         Random rnd = new Random();
 
                         s.update(elapsed);
 
                         //region Gravity and ground collision
-                        if(isOnGround(s, tMap) && s.getVelocityY() >= 0) {
+                        if (isOnGround(s, tMap) && s.getVelocityY() >= 0) {
                             //Stops s from falling
                             s.setVelocityY(0);
 
@@ -1251,27 +1223,25 @@ public class Game extends GameCore implements MouseListener {
                             //Moves s just out of the tile it landed on so there is no overlap
                             s.setY(tMap.getTileYC(0, yTile) - s.getHeight());
 
-                            if(s.getAnimation() == blackKnightBobbingLeft || s.getAnimation() == blackKnightIdleLeft) {
+                            if (s.getAnimation() == blackKnightBobbingLeft || s.getAnimation() == blackKnightIdleLeft) {
                                 s.setVelocityX(-0.2f);
                                 s.setAnimation(blackKnightBobbingLeft);
-                            }
-                            else {
+                            } else {
                                 s.setVelocityX(0.2f);
                                 s.setAnimation(blackKnightBobbingRight);
                             }
-                        }
-                        else {
+                        } else {
                             //Makes s fall
                             s.setVelocityY(s.getVelocityY() + gravity * elapsed);
                         }
                         //endregion
 
                         //region Jumping
-                        if(rnd.nextInt(200) == 1) {
-                            if(isOnGround(s, tMap)) {
+                        if (rnd.nextInt(200) == 1) {
+                            if (isOnGround(s, tMap)) {
                                 s.setVelocityY(Game.clamp((s.getVelocityY() + 0.1f) * -7.5f, -3, 0));
                                 s.setVelocityX(0);
-                                if(s.getAnimation() == blackKnightBobbingLeft || s.getAnimation() ==
+                                if (s.getAnimation() == blackKnightBobbingLeft || s.getAnimation() ==
                                         blackKnightIdleLeft)
                                     s.setAnimation(blackKnightIdleLeft);
                                 else
@@ -1287,12 +1257,11 @@ public class Game extends GameCore implements MouseListener {
                         //endregion
 
                         handleTileCollision(s, tMap, spriteIDs.get(i));
-                    }
-                    else if(spriteIDs.get(i) == ID.EnemyBlackPawn) {
+                    } else if (spriteIDs.get(i) == ID.EnemyBlackPawn) {
                         s.update(elapsed);
 
                         //region Gravity and ground collision
-                        if(isOnGround(s, tMap) && s.getVelocityY() >= 0) {
+                        if (isOnGround(s, tMap) && s.getVelocityY() >= 0) {
                             //Stops s from falling
                             s.setVelocityY(0);
 
@@ -1301,20 +1270,18 @@ public class Game extends GameCore implements MouseListener {
 
                             //Moves s just out of the tile it landed on so there is no overlap
                             s.setY(tMap.getTileYC(0, yTile) - s.getHeight());
-                        }
-                        else {
+                        } else {
                             //Makes s fall
                             s.setVelocityY(s.getVelocityY() + gravity * elapsed);
                         }
                         //endregion
 
                         handleTileCollision(s, tMap, spriteIDs.get(i));
-                    }
-                    else if(spriteIDs.get(i) == ID.EnemyBlackRook) {
+                    } else if (spriteIDs.get(i) == ID.EnemyBlackRook) {
                         s.update(elapsed);
 
                         //region Gravity and ground collision
-                        if(isOnGround(s, tMap) && s.getVelocityY() >= 0) {
+                        if (isOnGround(s, tMap) && s.getVelocityY() >= 0) {
                             //Stops s from falling
                             s.setVelocityY(0);
 
@@ -1323,8 +1290,7 @@ public class Game extends GameCore implements MouseListener {
 
                             //Moves s just out of the tile it landed on so there is no overlap
                             s.setY(tMap.getTileYC(0, yTile) - s.getHeight());
-                        }
-                        else {
+                        } else {
                             //Makes s fall
                             s.setVelocityY(s.getVelocityY() + gravity * elapsed);
                         }
@@ -1332,35 +1298,33 @@ public class Game extends GameCore implements MouseListener {
 
                         handleTileCollision(s, tMap, spriteIDs.get(i));
 
-                        if(whiteKnight.getX() + whiteKnight.getWidth() / 2f > s.getX() + s.getWidth() / 2f) {
+                        if (whiteKnight.getX() + whiteKnight.getWidth() / 2f > s.getX() + s.getWidth() / 2f) {
                             s.setVelocityX(0.075f);
-                        }
-                        else {
+                        } else {
                             s.setVelocityX(-0.075f);
                         }
                     }
 
-                    for(int j = 1; j < sprites.size(); j++) { //j initialised to 1 to avoid checking player sprite
+                    for (int j = 1; j < sprites.size(); j++) { //j initialised to 1 to avoid checking player sprite
                         Sprite s2 = sprites.get(j);
 
-                        if(s2 != s) {
-                            if(spriteIDs.get(i) == ID.Player) { //If s is the player sprite
+                        if (s2 != s) {
+                            if (spriteIDs.get(i) == ID.Player) { //If s is the player sprite
                                 //region Player on enemy collision
-                                if(!isRecovering) {
-                                    if(boundingBoxCollision(s, s2)) {
+                                if (!isRecovering) {
+                                    if (boundingBoxCollision(s, s2)) {
                                         //If the player died, return
                                         if (handleDamageCollision()) return;
                                     }
                                 }
                                 //endregion
-                            }
-                            else {
+                            } else {
                                 //region Enemy on enemy collision
-                                if(boundingBoxCollision(s, s2)) {
+                                if (boundingBoxCollision(s, s2)) {
                                     //If both sprites are going left
-                                    if(s.getVelocityX() < 0 && s2.getVelocityX() < 0) {
+                                    if (s.getVelocityX() < 0 && s2.getVelocityX() < 0) {
                                         //If s is the rightmost sprite
-                                        if(s.getX() > s2.getX()) {
+                                        if (s.getX() > s2.getX()) {
                                             //Change the direction s is going
                                             s.setVelocityX(s.getVelocityX() * -1);
                                             //Move s so that there is no overlap
@@ -1375,9 +1339,9 @@ public class Game extends GameCore implements MouseListener {
                                         }
                                     }
                                     //If both sprites are going right
-                                    else if(s.getVelocityX() > 0 && s2.getVelocityX() > 0) {
+                                    else if (s.getVelocityX() > 0 && s2.getVelocityX() > 0) {
                                         //If s is the leftmost sprite
-                                        if(s.getX() < s2.getX()) {
+                                        if (s.getX() < s2.getX()) {
                                             //Change the direction s is going
                                             s.setVelocityX(s.getVelocityX() * -1);
                                             //Move s so there is no overlap
@@ -1393,12 +1357,12 @@ public class Game extends GameCore implements MouseListener {
                                     }
                                     //If s is higher off the ground than s2 (most likely if s is in the air and s2 is
                                     //not)
-                                    else if(s.getY() + s.getHeight() > s2.getY() + s2.getHeight()) {
+                                    else if (s.getY() + s.getHeight() > s2.getY() + s2.getHeight()) {
                                         //Change the direction s2 is going
                                         s2.setVelocityX(s2.getVelocityX() * -1);
 
                                         //If s2 is the rightmost sprite
-                                        if(s2.getX() > s.getX()) {
+                                        if (s2.getX() > s.getX()) {
                                             //Move s2 to the right of s so there is no overlap
                                             s2.setX(s.getX() + s.getWidth() + 1);
                                         }
@@ -1410,12 +1374,12 @@ public class Game extends GameCore implements MouseListener {
                                     }
                                     //If s2 is higher off the ground than s (most likely if s2 is in the air and s is
                                     //not)
-                                    else if(s2.getY() + s2.getHeight() > s.getY() + s.getHeight()) {
+                                    else if (s2.getY() + s2.getHeight() > s.getY() + s.getHeight()) {
                                         //Change the direction s is going
                                         s.setVelocityX(s.getVelocityX() * -1);
 
                                         //If s is the rightmost sprite
-                                        if(s.getX() > s2.getX()) {
+                                        if (s.getX() > s2.getX()) {
                                             //Move s to the right of s so there is no overlap
                                             s.setX(s2.getX() + s2.getWidth() + 1);
                                         }
@@ -1432,31 +1396,28 @@ public class Game extends GameCore implements MouseListener {
                                         s2.setVelocityX(s2.getVelocityX() * -1);
 
                                         //Move s so that it no longer overlaps with s2
-                                        if(s.getX() < s2.getX()) {
+                                        if (s.getX() < s2.getX()) {
                                             //Move s so there is no overlap
                                             s.setX(s2.getX() - s.getWidth() - 1);
-                                        }
-                                        else {
+                                        } else {
                                             //Move s2 so there is no overlap
                                             s2.setX(s.getX() - s2.getWidth() - 1);
                                         }
                                     }
 
                                     //If s is a blackKnight
-                                    if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
-                                        if(s.getVelocityX() < 0) {
+                                    if (spriteIDs.get(i) == ID.EnemyBlackKnight) {
+                                        if (s.getVelocityX() < 0) {
                                             s.setAnimation(blackKnightBobbingLeft);
-                                        }
-                                        else {
+                                        } else {
                                             s.setAnimation(blackKnightBobbingRight);
                                         }
                                     }
                                     //If s2 is a blackKnight
-                                    if(spriteIDs.get(j) == ID.EnemyBlackKnight) {
-                                        if(s2.getVelocityX() < 0) {
+                                    if (spriteIDs.get(j) == ID.EnemyBlackKnight) {
+                                        if (s2.getVelocityX() < 0) {
                                             s2.setAnimation(blackKnightBobbingLeft);
-                                        }
-                                        else {
+                                        } else {
                                             s2.setAnimation(blackKnightBobbingRight);
                                         }
                                     }
@@ -1470,7 +1431,7 @@ public class Game extends GameCore implements MouseListener {
 
                     //If the player is recovering and at least 2 (not paused) seconds have passed since they started
                     //recovering...
-                    if(isRecovering && elapsedTimeSincePlayerEnemyCollision > 2000 + (pauseTimer / 1000000)) {
+                    if (isRecovering && elapsedTimeSincePlayerEnemyCollision > 2000 + (pauseTimer / 1000000)) {
                         //...stop recovery process
                         isRecovering = false;
                         recoveryTimer = 0;
@@ -1479,12 +1440,11 @@ public class Game extends GameCore implements MouseListener {
                         lastPauseTimer = 0;
 
                         //Change whiteKnight back to correct animation
-                        if(isFacingRight) {
-                            if(whiteKnight.getVelocityX() > 0) whiteKnight.setAnimation(whiteKnightBobbingRight);
+                        if (isFacingRight) {
+                            if (whiteKnight.getVelocityX() > 0) whiteKnight.setAnimation(whiteKnightBobbingRight);
                             else whiteKnight.setAnimation(whiteKnightIdleRight);
-                        }
-                        else {
-                            if(whiteKnight.getVelocityX() < 0) whiteKnight.setAnimation(whiteKnightBobbingLeft);
+                        } else {
+                            if (whiteKnight.getVelocityX() < 0) whiteKnight.setAnimation(whiteKnightBobbingLeft);
                             else whiteKnight.setAnimation(whiteKnightIdleLeft);
                         }
                     }

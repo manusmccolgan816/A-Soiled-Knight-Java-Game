@@ -15,23 +15,14 @@ public class HUD extends GameCore {
     private int numHorseShoesCollected; //The number of horse shoes the player has collected in the current level
     private int numHorseShoes; //The total number of horse shoes in the current level
 
-    //Font pixelFJVerdana;
+    private Game game;
 
-    public HUD(int health, int maxHealth, int numHorseShoesCollected, int numHorseShoes) {
+    public HUD(Game game, int health, int maxHealth, int numHorseShoesCollected, int numHorseShoes) {
+        this.game = game;
         this.health = health;
         this.maxHealth = maxHealth;
         this.numHorseShoesCollected = numHorseShoesCollected;
         this.numHorseShoes = numHorseShoes;
-
-//        //Creating the font
-//        InputStream is = getClass().getResourceAsStream("fonts/PixelFJVerdana12pt.ttf");
-//        try {
-//            pixelFJVerdana = Font.createFont(Font.TRUETYPE_FONT, is);
-//        } catch (FontFormatException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @Override
@@ -64,6 +55,12 @@ public class HUD extends GameCore {
 
         //Displaying horse shoe info
         g.drawString("Horse shoes collected: " + numHorseShoesCollected + "/" + numHorseShoes, nextHeartX + 10, nextHeartY + 30);
+
+        if (Game.isDebugModeOn) {
+            g.setColor(Color.RED);
+            g.drawString("x: " + game.getWhiteKnight().getX(), nextHeartX + 10, nextHeartY + 50);
+            g.drawString("y: " + game.getWhiteKnight().getY(), nextHeartX + 10, nextHeartY + 70);
+        }
     }
 
     public int getHealth() {
