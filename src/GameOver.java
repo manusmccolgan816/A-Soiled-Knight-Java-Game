@@ -51,7 +51,7 @@ public class GameOver extends GameCore implements MouseListener {
         if(mouseX >= retryPosX && mouseX <= (retryPosX + imgRetry.getWidth(null)) && mouseY >= retryPosY &&
                 mouseY <= (retryPosY + imgRetry.getHeight(null))) {
             //CURRENTLEVEL is decremented so that calling goToNextLevel() simply restarts the level the player died on
-            Game.CURRENTLEVEL--;
+            Game.currentLevel--;
             game.initialiseGame();
             game.goToNextLevel();
         }

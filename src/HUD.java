@@ -1,8 +1,6 @@
 import game2D.GameCore;
 
 import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * The HUD displays the player's health, the current level and
@@ -62,7 +60,7 @@ public class HUD extends GameCore {
 
         //Displaying level number
         g.setColor(new Color(34, 35, 35));
-        g.drawString("Level: " + Game.CURRENTLEVEL, nextHeartX + 10, nextHeartY + 10);
+        g.drawString("Level: " + Game.currentLevel, nextHeartX + 10, nextHeartY + 10);
 
         //Displaying horse shoe info
         g.drawString("Horse shoes collected: " + numHorseShoesCollected + "/" + numHorseShoes, nextHeartX + 10, nextHeartY + 30);

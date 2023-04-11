@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
-import java.util.logging.Logger;
 
 import game2D.*;
 import sound.*;
@@ -22,7 +21,7 @@ public class Game extends GameCore implements MouseListener {
     public static final int SCREEN_HEIGHT = 576; //144 * 4
 
     public STATE gameState;
-    public static int CURRENTLEVEL = 0; //When this is 0, no level is being played
+    public static int currentLevel = 0; //When this is 0, no level is being played
 
     private final float gravity = 0.002f;
 
@@ -56,7 +55,7 @@ public class Game extends GameCore implements MouseListener {
 
     private Sprite whiteKnight = null;
 
-    private final TileMap tmap = new TileMap();
+    private final TileMap tMap = new TileMap();
     public static final char horseShoeChar = 'e';
     public static final char heartChar = 'h';
     public static final ArrayList<Character> backgroundChars = new ArrayList<>(
@@ -76,11 +75,11 @@ public class Game extends GameCore implements MouseListener {
 
     private PlayMIDI backgroundSong;
 
-    private final String jumpSoundFilepath = "sounds/jump16bit.wav";
-    private final String hitHurtSoundFilepath = "sounds/hitHurt16bit.wav";
-    private final String pickupHorseshoeSoundFilepath = "sounds/pickupHorseshoe16bit.wav";
-    private final String healthUpSoundFilepath = "sounds/healthUp16bit.wav";
-    private final String pauseSoundFilepath = "sounds/pause16bit.wav";
+    private static final String jumpSoundFilepath = "sounds/jump16bit.wav";
+    private static final String hitHurtSoundFilepath = "sounds/hitHurt16bit.wav";
+    private static final String pickupHorseshoeSoundFilepath = "sounds/pickupHorseshoe16bit.wav";
+    private static final String healthUpSoundFilepath = "sounds/healthUp16bit.wav";
+    private static final String pauseSoundFilepath = "sounds/pause16bit.wav";
 
     /**
      * The main method that creates an instance of our class and starts it running.
@@ -180,7 +179,7 @@ public class Game extends GameCore implements MouseListener {
      */
     public void initialiseMenu() {
         gameState = STATE.Menu;
-        CURRENTLEVEL = 0; //Progress is not saved, when 'Start' is clicked the player will start at level 1
+        currentLevel = 0; //Progress is not saved, when 'Start' is clicked the player will start at level 1
 
         //Remove the mouse listeners which may still be running for other objects
         removeMouseListener(gameOver);
@@ -275,10 +274,10 @@ public class Game extends GameCore implements MouseListener {
             controls.draw(g);
         }
         else if(gameState == STATE.Game) {
-            if(CURRENTLEVEL == 1) {
+            if(currentLevel == 1) {
                 level1.draw(g);
             }
-            else if(CURRENTLEVEL == 2) {
+            else if(currentLevel == 2) {
                 level2.draw(g);
             }
             hud.draw(g);
@@ -301,10 +300,10 @@ public class Game extends GameCore implements MouseListener {
             menu.update(elapsed);
         }
         else if(gameState == STATE.Game) {
-            if(CURRENTLEVEL == 1) {
+            if(currentLevel == 1) {
                 level1.update(elapsed);
             }
-            else if(CURRENTLEVEL == 2) {
+            else if(currentLevel == 2) {
                 level2.update(elapsed);
             }
         }
@@ -334,23 +333,23 @@ public class Game extends GameCore implements MouseListener {
      * Checks if a sprite is on the ground.
      *
      * @param s    The sprite to check
-     * @param tmap The tilemap to check
-     * @return     True if s is on a ground tile
+     * @param tMap The tilemap to check
+     * @return     true if s is on a ground tile
      */
-    public boolean isOnGround(Sprite s, TileMap tmap) {
+    public boolean isOnGround(Sprite s, TileMap tMap) {
         //Take a note of a sprite's current position
         float sx = s.getX();
         float sy = s.getY();
 
         //Find out how wide and how tall a tile is
-        float tileWidth = tmap.getTileWidth();
-        float tileHeight = tmap.getTileHeight();
+        float tileWidth = tMap.getTileWidth();
+        float tileHeight = tMap.getTileHeight();
 
         //Gets the number of tiles across and down the bottom-left corner of s is, 6 pixels in to avoid side-on
         //collisions being detected
-        int xtile = (int) ((sx + 6) / tileWidth);
-        int ytile = (int) ((sy + s.getHeight()) / tileHeight);
-        char ch = tmap.getTileChar(xtile, ytile);
+        int xTile = (int) ((sx + 6) / tileWidth);
+        int yTile = (int) ((sy + s.getHeight()) / tileHeight);
+        char ch = tMap.getTileChar(xTile, yTile);
 
         //If it's a ground tile
         if (!backgroundChars.contains(ch)) {
@@ -359,9 +358,9 @@ public class Game extends GameCore implements MouseListener {
 
         //Gets the number of tiles across and down the bottom-right corner of s is, 6 pixels in to avoid side-on
         //collisions being detected
-        xtile = (int) ((sx + s.getWidth() - 6) / tileWidth);
-        ytile = (int) ((sy + s.getHeight()) / tileHeight);
-        ch = tmap.getTileChar(xtile, ytile);
+        xTile = (int) ((sx + s.getWidth() - 6) / tileWidth);
+        yTile = (int) ((sy + s.getHeight()) / tileHeight);
+        ch = tMap.getTileChar(xTile, yTile);
 
         //Return true if it is a ground tile, false if not
         return !backgroundChars.contains(ch);
@@ -372,9 +371,9 @@ public class Game extends GameCore implements MouseListener {
      * given sprite s.
      *
      * @param s    The Sprite to check collisions for
-     * @param tmap The tile map to check
+     * @param tMap The tile map to check
      */
-    public void handleTileCollision(Sprite s, TileMap tmap, ID id) {
+    public void handleTileCollision(Sprite s, TileMap tMap, ID id) {
         boolean reverseVelX = false;
         boolean turnToRight = false;
 
@@ -383,21 +382,21 @@ public class Game extends GameCore implements MouseListener {
         float sy = s.getY();
 
         //Find out how wide and how tall a tile is
-        float tileWidth = tmap.getTileWidth();
-        float tileHeight = tmap.getTileHeight();
+        float tileWidth = tMap.getTileWidth();
+        float tileHeight = tMap.getTileHeight();
 
         //region Top-left collisions
         //Divide s’s x coordinate by the width of a tile to get the number of tiles across the x-axis that the sprite
         //is positioned at
-        int xtile = (int) (sx / tileWidth);
+        int xTile = (int) (sx / tileWidth);
         //The same applies to the y coordinate
-        int ytile = (int) (sy / tileHeight);
+        int yTile = (int) (sy / tileHeight);
 
         //The tile character at the top left of sprite s
-        char ch = tmap.getTileChar(xtile, ytile);
+        char ch = tMap.getTileChar(xTile, yTile);
 
         if (!backgroundChars.contains(ch)) {
-            if(isOnGround(s, tmap) || sx >= tmap.getTileXC(xtile, ytile) + tileWidth - 6) {
+            if(isOnGround(s, tMap) || sx >= tMap.getTileXC(xTile, yTile) + tileWidth - 6) {
                 if(id == ID.Player) {
                     if(damageChars.contains(ch)) {
                         //If the player isn't recovering...
@@ -415,10 +414,10 @@ public class Game extends GameCore implements MouseListener {
                     turnToRight = true;
                 }
 
-                xtile = (int) (sx / tileWidth);
-                ytile = (int) ((sy + s.getHeight()) / tileHeight);
+                xTile = (int) (sx / tileWidth);
+                yTile = (int) ((sy + s.getHeight()) / tileHeight);
                 //Move s just out of the tile it moved into so there is no overlap
-                s.setX(tmap.getTileXC(xtile, ytile) + tileWidth);
+                s.setX(tMap.getTileXC(xTile, yTile) + tileWidth);
             }
             //If s is not on the ground (i.e. hitting a tile from underneath)...
             else {
@@ -426,23 +425,23 @@ public class Game extends GameCore implements MouseListener {
                 s.setVelocityY(0);
 
                 //Move s just out of the tile it moved into so there is no overlap
-                s.setY(tmap.getTileYC(xtile, ytile) + s.getHeight() + 0.1f);
+                s.setY(tMap.getTileYC(xTile, yTile) + s.getHeight() + 0.1f);
             }
         }
         //If s is the player and collided with a horse shoe or heart
         else {
-            checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
-            checkHandleHeartCollision(tmap, id, xtile, ytile, ch);
+            checkHandleHorseShoeCollision(tMap, id, xTile, yTile, ch);
+            checkHandleHeartCollision(tMap, id, xTile, yTile, ch);
         }
         //endregion
 
         //region Top-right collisions
-        xtile = (int) ((sx + s.getWidth()) / tileWidth);
-        ytile = (int) (sy / tileHeight);
-        ch = tmap.getTileChar(xtile, ytile);
+        xTile = (int) ((sx + s.getWidth()) / tileWidth);
+        yTile = (int) (sy / tileHeight);
+        ch = tMap.getTileChar(xTile, yTile);
 
         if (!backgroundChars.contains(ch)) {
-            if(isOnGround(s, tmap) || sx + s.getWidth() <= tmap.getTileXC(xtile, ytile) + 6) {
+            if(isOnGround(s, tMap) || sx + s.getWidth() <= tMap.getTileXC(xTile, yTile) + 6) {
                 if(id == ID.Player)
                 {
                     if(damageChars.contains(ch)) {
@@ -460,10 +459,10 @@ public class Game extends GameCore implements MouseListener {
                     reverseVelX = true;
                 }
 
-                xtile = (int) ((sx + s.getWidth())  / tileWidth);
-                ytile = (int) ((sy + s.getHeight()) / tileHeight);
+                xTile = (int) ((sx + s.getWidth())  / tileWidth);
+                yTile = (int) ((sy + s.getHeight()) / tileHeight);
                 //Move s just out of the tile it moved into so there is no overlap
-                s.setX(tmap.getTileXC(xtile, ytile) - s.getWidth() - 0.1f);
+                s.setX(tMap.getTileXC(xTile, yTile) - s.getWidth() - 0.1f);
             }
             //If s is not on the ground (i.e. hitting a tile from underneath)...
             else {
@@ -471,23 +470,23 @@ public class Game extends GameCore implements MouseListener {
                 s.setVelocityY(0);
 
                 //Move s just out of the tile it moved into so there is no overlap
-                s.setY(tmap.getTileYC(xtile, ytile) + s.getHeight() + 0.1f);
+                s.setY(tMap.getTileYC(xTile, yTile) + s.getHeight() + 0.1f);
             }
         }
         //If s is the player and collided with a horse shoe or heart
         else {
-            checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
-            checkHandleHeartCollision(tmap, id, xtile, ytile, ch);
+            checkHandleHorseShoeCollision(tMap, id, xTile, yTile, ch);
+            checkHandleHeartCollision(tMap, id, xTile, yTile, ch);
         }
         //endregion
 
         //Just checking the corners will not cover all possible collision areas if s is taller than a tile
         if(s.getHeight() > tileHeight) {
             //region Centre-left collisions
-            //ytile is the middle y point of s so that it doesn't detect ground collisions
-            xtile = (int) (sx / tileWidth);
-            ytile = (int) ((sy + (s.getHeight() / 2)) / tileHeight);
-            ch = tmap.getTileChar(xtile, ytile);
+            //yTile is the middle y point of s so that it doesn't detect ground collisions
+            xTile = (int) (sx / tileWidth);
+            yTile = (int) ((sy + (s.getHeight() / 2)) / tileHeight);
+            ch = tMap.getTileChar(xTile, yTile);
 
             if(!backgroundChars.contains(ch)) {
                 if(id == ID.Player)
@@ -508,19 +507,19 @@ public class Game extends GameCore implements MouseListener {
                     turnToRight = true;
                 }
                 //Moves s just out of the tile it moved into so there is no overlap
-                s.setX(tmap.getTileXC(xtile, ytile) + tileWidth);
+                s.setX(tMap.getTileXC(xTile, yTile) + tileWidth);
             }
             //If s is the player and collided with a horse shoe or heart
             else {
-                checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
-                checkHandleHeartCollision(tmap, id, xtile, ytile, ch);
+                checkHandleHorseShoeCollision(tMap, id, xTile, yTile, ch);
+                checkHandleHeartCollision(tMap, id, xTile, yTile, ch);
             }
             //endregion
 
             //region Centre-right collisions
-            xtile = (int) ((sx + s.getWidth())  / tileWidth);
-            ytile = (int) ((sy + s.getHeight() / 2) / tileHeight);
-            ch = tmap.getTileChar(xtile, ytile);
+            xTile = (int) ((sx + s.getWidth())  / tileWidth);
+            yTile = (int) ((sy + s.getHeight() / 2) / tileHeight);
+            ch = tMap.getTileChar(xTile, yTile);
 
             if(!backgroundChars.contains(ch)) {
                 if(id == ID.Player)
@@ -539,20 +538,20 @@ public class Game extends GameCore implements MouseListener {
                     reverseVelX = true;
                 }
                 //Moves s just out of the tile it moved into so there is no overlap
-                s.setX(tmap.getTileXC(xtile, ytile) - s.getWidth() - 0.1f);
+                s.setX(tMap.getTileXC(xTile, yTile) - s.getWidth() - 0.1f);
             }
             //If s is the player and collided with a horse shoe or heart
             else {
-                checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
-                checkHandleHeartCollision(tmap, id, xtile, ytile, ch);
+                checkHandleHorseShoeCollision(tMap, id, xTile, yTile, ch);
+                checkHandleHeartCollision(tMap, id, xTile, yTile, ch);
             }
             //endregion
         }
 
         //region Bottom-left collisions
-        xtile = (int) (sx / tileWidth);
-        ytile = (int) ((sy + s.getHeight()) / tileHeight);
-        ch = tmap.getTileChar(xtile, ytile);
+        xTile = (int) (sx / tileWidth);
+        yTile = (int) ((sy + s.getHeight()) / tileHeight);
+        ch = tMap.getTileChar(xTile, yTile);
 
         if(!backgroundChars.contains(ch)) {
             if(damageChars.contains(ch) && id == ID.Player) {
@@ -561,7 +560,7 @@ public class Game extends GameCore implements MouseListener {
                     if (handleDamageCollision()) return;
                 }
             }
-            if(!isOnGround(s, tmap))
+            if(!isOnGround(s, tMap))
             {
                 if(id == ID.Player)
                 {
@@ -574,20 +573,20 @@ public class Game extends GameCore implements MouseListener {
                 }
 
                 //Moves s just out of the tile it moved into so there is no overlap
-                s.setX(tmap.getTileXC(xtile, ytile) + tileWidth);
+                s.setX(tMap.getTileXC(xTile, yTile) + tileWidth);
             }
         }
         //If s is the player and collided with a horse shoe or heart
         else {
-            checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
-            checkHandleHeartCollision(tmap, id, xtile, ytile, ch);
+            checkHandleHorseShoeCollision(tMap, id, xTile, yTile, ch);
+            checkHandleHeartCollision(tMap, id, xTile, yTile, ch);
         }
         //endregion
 
         //region Bottom-right collisions
-        xtile = (int) ((sx + s.getWidth())  / tileWidth);
-        ytile = (int) ((sy + s.getHeight()) / tileHeight);
-        ch = tmap.getTileChar(xtile, ytile);
+        xTile = (int) ((sx + s.getWidth())  / tileWidth);
+        yTile = (int) ((sy + s.getHeight()) / tileHeight);
+        ch = tMap.getTileChar(xTile, yTile);
 
         if(!backgroundChars.contains(ch)) {
             if(damageChars.contains(ch) && id == ID.Player) {
@@ -596,7 +595,7 @@ public class Game extends GameCore implements MouseListener {
                     if (handleDamageCollision()) return;
                 }
             }
-            if(!isOnGround(s, tmap)) {
+            if(!isOnGround(s, tMap)) {
                 if(id == ID.Player)
                 {
                     //Stop horizontal movement
@@ -607,13 +606,13 @@ public class Game extends GameCore implements MouseListener {
                 }
 
                 //Moves s just out of the tile it moved into so there is no overlap
-                s.setX(tmap.getTileXC(xtile, ytile) - s.getWidth() - 0.1f);
+                s.setX(tMap.getTileXC(xTile, yTile) - s.getWidth() - 0.1f);
             }
         }
         //If s is the player and collided with a horse shoe or heart
         else {
-            checkHandleHorseShoeCollision(tmap, id, xtile, ytile, ch);
-            checkHandleHeartCollision(tmap, id, xtile, ytile, ch);
+            checkHandleHorseShoeCollision(tMap, id, xTile, yTile, ch);
+            checkHandleHeartCollision(tMap, id, xTile, yTile, ch);
         }
         //endregion
 
@@ -631,11 +630,11 @@ public class Game extends GameCore implements MouseListener {
         }
     }
 
-    private void checkHandleHorseShoeCollision(TileMap tmap, ID id, int xtile, int ytile, char ch) {
+    private void checkHandleHorseShoeCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
         if(ch == horseShoeChar && id == ID.Player) {
             new Sound(pickupHorseshoeSoundFilepath).start();
 
-            tmap.setTileChar('.', xtile, ytile); //Change the horse shoe to empty space
+            tMap.setTileChar('.', xTile, yTile); //Change the horse shoe to empty space
             hud.incrementHorseShoesCollected();
 
             if(hud.getNumHorseShoesCollected() == hud.getNumHorseShoes()) {
@@ -646,11 +645,11 @@ public class Game extends GameCore implements MouseListener {
         }
     }
 
-    private void checkHandleHeartCollision(TileMap tmap, ID id, int xtile, int ytile, char ch) {
+    private void checkHandleHeartCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
         if (ch == heartChar && id == ID.Player) {
             new Sound(healthUpSoundFilepath).start();
 
-            tmap.setTileChar('.', xtile, ytile);
+            tMap.setTileChar('.', xTile, yTile);
 
             int health = hud.getHealth();
             if (health < hud.getMaxHealth()) {
@@ -702,45 +701,45 @@ public class Game extends GameCore implements MouseListener {
         removeMouseListener(controls);
 
         //If there is no current level...
-        if(CURRENTLEVEL == 0) {
+        if(currentLevel == 0) {
             //Load the tile map
-            tmap.loadMap("maps", "Level1Map.txt");
+            tMap.loadMap("maps", "Level1Map.txt");
 
             //Load the background image
             Image imgBackground = loadImage("images/RollingHillsResized.png");
 
             //Initialise the HUD, giving the max health for the level and the number of horse shoes to collect
-            hud = new HUD(4, 4, 0, countHorseShoesInMap(tmap));
+            hud = new HUD(4, 4, 0, countHorseShoesInMap(tMap));
 
             //Set the position of the player
-            whiteKnight.setPosition(tmap.getTileXC(6, 0), tmap.getTileYC(0, 8));
+            whiteKnight.setPosition(tMap.getTileXC(6, 0), tMap.getTileYC(0, 8));
             sprites.add(whiteKnight);
             spriteIDs.add(ID.Player);
 
             //Set the positions of the level's enemies
             Sprite blackPawn0 = new Sprite(blackPawnBob);
             blackPawn0.show();
-            blackPawn0.setPosition(tmap.getTileXC(12, 0), tmap.getTileYC(0, 8));
+            blackPawn0.setPosition(tMap.getTileXC(12, 0), tMap.getTileYC(0, 8));
             blackPawn0.setVelocityX(0.2f);
             sprites.add(blackPawn0);
             spriteIDs.add(ID.EnemyBlackPawn);
 
             Sprite blackPawn1 = new Sprite(blackPawnBob);
             blackPawn1.show();
-            blackPawn1.setPosition(tmap.getTileXC(40, 0), tmap.getTileYC(0, 7));
+            blackPawn1.setPosition(tMap.getTileXC(40, 0), tMap.getTileYC(0, 7));
             blackPawn1.setVelocityX(0.2f);
             sprites.add(blackPawn1);
             spriteIDs.add(ID.EnemyBlackPawn);
 
             Sprite blackKnight1 = new Sprite(blackKnightBobbingLeft);
             blackKnight1.show();
-            blackKnight1.setPosition(tmap.getTileXC(53, 0), tmap.getTileYC(0, 7));
+            blackKnight1.setPosition(tMap.getTileXC(53, 0), tMap.getTileYC(0, 7));
             sprites.add(blackKnight1);
             spriteIDs.add(ID.EnemyBlackKnight);
 
             Sprite blackKnight2 = new Sprite(blackKnightBobbingLeft);
             blackKnight2.show();
-            blackKnight2.setPosition(tmap.getTileXC(89, 0), tmap.getTileYC(0, 7));
+            blackKnight2.setPosition(tMap.getTileXC(89, 0), tMap.getTileYC(0, 7));
             sprites.add(blackKnight2);
             spriteIDs.add(ID.EnemyBlackKnight);
 
@@ -752,51 +751,51 @@ public class Game extends GameCore implements MouseListener {
                 e.printStackTrace();
             }
 
-            level1 = new Level(sprites, spriteIDs, tmap, imgBackground);
-            CURRENTLEVEL = 1;
+            level1 = new Level(sprites, spriteIDs, tMap, imgBackground);
+            currentLevel = 1;
         }
-        else if(CURRENTLEVEL == 1) {
+        else if(currentLevel == 1) {
             //Load the tile map
-            tmap.loadMap("maps", "Level2Map.txt");
+            tMap.loadMap("maps", "Level2Map.txt");
 
             //Load the background image
             Image imgBackground = loadImage("images/RollingHillsResized.png");
 
-            hud = new HUD(4, 4, 0, countHorseShoesInMap(tmap));
+            hud = new HUD(4, 4, 0, countHorseShoesInMap(tMap));
 
-            whiteKnight.setPosition(tmap.getTileXC(4, 0), tmap.getTileYC(0, 17));
+            whiteKnight.setPosition(tMap.getTileXC(4, 0), tMap.getTileYC(0, 17));
             sprites.add(whiteKnight);
             spriteIDs.add(ID.Player);
 
             Sprite blackKnight1 = new Sprite(blackKnightBobbingLeft);
             blackKnight1.show();
-            blackKnight1.setPosition(tmap.getTileXC(19, 0), tmap.getTileYC(0, 4));
+            blackKnight1.setPosition(tMap.getTileXC(19, 0), tMap.getTileYC(0, 4));
             sprites.add(blackKnight1);
             spriteIDs.add(ID.EnemyBlackKnight);
 
             Sprite blackPawn3 = new Sprite(blackPawnBob);
             blackPawn3.show();
-            blackPawn3.setPosition(tmap.getTileXC(22, 0), tmap.getTileYC(0, 4));
+            blackPawn3.setPosition(tMap.getTileXC(22, 0), tMap.getTileYC(0, 4));
             blackPawn3.setVelocityX(0.2f);
             sprites.add(blackPawn3);
             spriteIDs.add(ID.EnemyBlackPawn);
 
             Sprite blackRook1 = new Sprite(blackRookIdle);
             blackRook1.show();
-            blackRook1.setPosition(tmap.getTileXC(34, 0), tmap.getTileYC(0, 13));
+            blackRook1.setPosition(tMap.getTileXC(34, 0), tMap.getTileYC(0, 13));
             sprites.add(blackRook1);
             spriteIDs.add(ID.EnemyBlackRook);
 
             Sprite blackPawn1 = new Sprite(blackPawnBob);
             blackPawn1.show();
-            blackPawn1.setPosition(tmap.getTileXC(48, 0), tmap.getTileYC(0, 16));
+            blackPawn1.setPosition(tMap.getTileXC(48, 0), tMap.getTileYC(0, 16));
             blackPawn1.setVelocityX(0.2f);
             sprites.add(blackPawn1);
             spriteIDs.add(ID.EnemyBlackPawn);
 
             Sprite blackPawn2 = new Sprite(blackPawnBob);
             blackPawn2.show();
-            blackPawn2.setPosition(tmap.getTileXC(51, 0), tmap.getTileYC(0, 16));
+            blackPawn2.setPosition(tMap.getTileXC(51, 0), tMap.getTileYC(0, 16));
             blackPawn2.setVelocityX(0.2f);
             sprites.add(blackPawn2);
             spriteIDs.add(ID.EnemyBlackPawn);
@@ -808,8 +807,8 @@ public class Game extends GameCore implements MouseListener {
                 e.printStackTrace();
             }
 
-            level2 = new Level(sprites, spriteIDs, tmap, imgBackground);
-            CURRENTLEVEL = 2;
+            level2 = new Level(sprites, spriteIDs, tMap, imgBackground);
+            currentLevel = 2;
         }
         else {
             initialiseCompleted();
@@ -900,27 +899,24 @@ public class Game extends GameCore implements MouseListener {
     public static float clamp(float val, float min, float max) {
         if(val >= max)
             return max;
-        else if(val <= min)
-            return min;
-        else
-            return val;
+        else return Math.max(val, min);
     }
 
     /**
      * Counts and returns the number of horse shoe tiles in the given tilemap.
      *
-     * @param tmap the TileMap to check
+     * @param tMap the TileMap to check
      * @return the number of horse shoes in the tilemap
      */
-    public int countHorseShoesInMap(TileMap tmap) {
-        int mapWidth = tmap.getMapWidth();
-        int mapHeight = tmap.getTileHeight();
+    public int countHorseShoesInMap(TileMap tMap) {
+        int mapWidth = tMap.getMapWidth();
+        int mapHeight = tMap.getTileHeight();
         char tileChar;
         int numHorseShoes = 0;
 
         for(int i = 0; i < mapWidth; i++) {
             for(int j = 0; j < mapHeight; j++) {
-                tileChar = tmap.getTileChar(i, j);
+                tileChar = tMap.getTileChar(i, j);
 
                 //Increment numHorseShoes if a horse shoe is found
                 if(tileChar == horseShoeChar)
@@ -958,12 +954,12 @@ public class Game extends GameCore implements MouseListener {
 
     class Level extends GameCore {
 
-        private final TileMap tmap;
+        private final TileMap tMap;
 
-        private LinkedList<Sprite> sprites;
-        private LinkedList<ID> spriteIDs;
+        private final LinkedList<Sprite> sprites;
+        private final LinkedList<ID> spriteIDs;
 
-        private float[][] spriteVelocities;
+        private final float[][] spriteVelocities;
 
         private long pauseTimer;
         /*
@@ -977,12 +973,12 @@ public class Game extends GameCore implements MouseListener {
         private float backgroundX, backgroundX2;
         private int previousXOffset;
 
-        public Level(LinkedList<Sprite> sprites, LinkedList<ID> spriteIDs, TileMap tmap, Image imgBackground) {
+        public Level(LinkedList<Sprite> sprites, LinkedList<ID> spriteIDs, TileMap tMap, Image imgBackground) {
             pack();
 
             this.sprites = sprites;
             this.spriteIDs = spriteIDs;
-            this.tmap = tmap;
+            this.tMap = tMap;
             this.imgBackground = imgBackground;
 
             backgroundWidth = imgBackground.getWidth(null);
@@ -1015,7 +1011,7 @@ public class Game extends GameCore implements MouseListener {
                     //Adjusts the x offset so that the player is to the left of the centre of the screen
                     xOffset = (int) (-s.getX()) + (SCREEN_WIDTH / 2) - s.getWidth();
                     //Ensures that the screen does not scroll past the bounds of the map
-                    xOffset = (int) clamp(xOffset, -tmap.getPixelWidth() + SCREEN_WIDTH + getInsets().left,
+                    xOffset = (int) clamp(xOffset, -tMap.getPixelWidth() + SCREEN_WIDTH + getInsets().left,
                             getInsets().right);
 
                     //screenScrolling is false if the screen hasn't scrolled along the x-axis since the last run of
@@ -1027,7 +1023,7 @@ public class Game extends GameCore implements MouseListener {
                     //Adjusts the y offset so that the player is close to the centre of the screen
                     yOffset = (int) (-s.getY()) + (SCREEN_HEIGHT / 2) - s.getHeight();
                     //Ensures that the screen does not scroll past the bounds of the map
-                    yOffset = (int) clamp(yOffset, -tmap.getPixelHeight() + SCREEN_HEIGHT + getInsets().top,
+                    yOffset = (int) clamp(yOffset, -tMap.getPixelHeight() + SCREEN_HEIGHT + getInsets().top,
                             0);
 
                     //Apply offsets to whiteKnight
@@ -1077,7 +1073,7 @@ public class Game extends GameCore implements MouseListener {
                     //endregion
 
                     //Apply offsets to tile map and draw  it
-                    tmap.draw(g, xOffset, yOffset);
+                    tMap.draw(g, xOffset, yOffset);
 
                     //Draw the player
                     s.draw(g);
@@ -1176,15 +1172,15 @@ public class Game extends GameCore implements MouseListener {
                         s.update(elapsed);
 
                         //region Gravity and ground collision
-                        if(isOnGround(s, tmap) && s.getVelocityY() >= 0) {
+                        if(isOnGround(s, tMap) && s.getVelocityY() >= 0) {
                             //Stops whiteKnight from falling
                             s.setVelocityY(0);
 
                             //Gets the number of tiles across and down the bottom-left corner of whiteKnight is
-                            int ytile = (int) ((s.getY() + s.getHeight()) / tmap.getTileHeight());
+                            int yTile = (int) ((s.getY() + s.getHeight()) / tMap.getTileHeight());
 
                             //Moves whiteKnight just out of the tile it landed on so there is no overlap
-                            s.setY(tmap.getTileYC(0, ytile) - s.getHeight());
+                            s.setY(tMap.getTileYC(0, yTile) - s.getHeight());
                         }
                         else {
                             //Makes whiteKnight fall
@@ -1199,7 +1195,7 @@ public class Game extends GameCore implements MouseListener {
                             isFacingRight = false;
                             if(isRecovering) s.setAnimation(whiteKnightRecoveringIdleLeft);
                             else {
-                                if(isOnGround(s, tmap)) {
+                                if(isOnGround(s, tMap)) {
                                     s.setAnimation(whiteKnightBobbingLeft);
                                 }
                                 else {
@@ -1215,7 +1211,7 @@ public class Game extends GameCore implements MouseListener {
                             isFacingRight = true;
                             if(isRecovering) s.setAnimation(whiteKnightRecoveringIdleRight);
                             else {
-                                if(isOnGround(s, tmap)) {
+                                if(isOnGround(s, tMap)) {
                                     s.setAnimation(whiteKnightBobbingRight);
                                 }
                                 else {
@@ -1228,7 +1224,7 @@ public class Game extends GameCore implements MouseListener {
                         //endregion
 
                         //region Jumping
-                        if(spacePressed && isOnGround(s, tmap) && canJump) {
+                        if(spacePressed && isOnGround(s, tMap) && canJump) {
                             canJump = false;
                             //s jumps
                             s.setVelocityY(clamp((s.getVelocityY() + 0.1f) * -7.5f, -3, 0));
@@ -1237,7 +1233,7 @@ public class Game extends GameCore implements MouseListener {
                         }
                         //endregion
 
-                        handleTileCollision(s, tmap, ID.Player);
+                        handleTileCollision(s, tMap, ID.Player);
                     }
                     else if(spriteIDs.get(i) == ID.EnemyBlackKnight) {
                         Random rnd = new Random();
@@ -1245,15 +1241,15 @@ public class Game extends GameCore implements MouseListener {
                         s.update(elapsed);
 
                         //region Gravity and ground collision
-                        if(isOnGround(s, tmap) && s.getVelocityY() >= 0) {
+                        if(isOnGround(s, tMap) && s.getVelocityY() >= 0) {
                             //Stops s from falling
                             s.setVelocityY(0);
 
                             //Gets the number of tiles across and down the bottom-left corner of s is
-                            int ytile = (int) ((s.getY() + s.getHeight()) / tmap.getTileHeight());
+                            int yTile = (int) ((s.getY() + s.getHeight()) / tMap.getTileHeight());
 
                             //Moves s just out of the tile it landed on so there is no overlap
-                            s.setY(tmap.getTileYC(0, ytile) - s.getHeight());
+                            s.setY(tMap.getTileYC(0, yTile) - s.getHeight());
 
                             if(s.getAnimation() == blackKnightBobbingLeft || s.getAnimation() == blackKnightIdleLeft) {
                                 s.setVelocityX(-0.2f);
@@ -1272,7 +1268,7 @@ public class Game extends GameCore implements MouseListener {
 
                         //region Jumping
                         if(rnd.nextInt(200) == 1) {
-                            if(isOnGround(s, tmap)) {
+                            if(isOnGround(s, tMap)) {
                                 s.setVelocityY(Game.clamp((s.getVelocityY() + 0.1f) * -7.5f, -3, 0));
                                 s.setVelocityX(0);
                                 if(s.getAnimation() == blackKnightBobbingLeft || s.getAnimation() ==
@@ -1290,21 +1286,21 @@ public class Game extends GameCore implements MouseListener {
                         }
                         //endregion
 
-                        handleTileCollision(s, tmap, spriteIDs.get(i));
+                        handleTileCollision(s, tMap, spriteIDs.get(i));
                     }
                     else if(spriteIDs.get(i) == ID.EnemyBlackPawn) {
                         s.update(elapsed);
 
                         //region Gravity and ground collision
-                        if(isOnGround(s, tmap) && s.getVelocityY() >= 0) {
+                        if(isOnGround(s, tMap) && s.getVelocityY() >= 0) {
                             //Stops s from falling
                             s.setVelocityY(0);
 
                             //Gets the number of tiles across and down the bottom-left corner of s is
-                            int ytile = (int) ((s.getY() + s.getHeight()) / tmap.getTileHeight());
+                            int yTile = (int) ((s.getY() + s.getHeight()) / tMap.getTileHeight());
 
                             //Moves s just out of the tile it landed on so there is no overlap
-                            s.setY(tmap.getTileYC(0, ytile) - s.getHeight());
+                            s.setY(tMap.getTileYC(0, yTile) - s.getHeight());
                         }
                         else {
                             //Makes s fall
@@ -1312,21 +1308,21 @@ public class Game extends GameCore implements MouseListener {
                         }
                         //endregion
 
-                        handleTileCollision(s, tmap, spriteIDs.get(i));
+                        handleTileCollision(s, tMap, spriteIDs.get(i));
                     }
                     else if(spriteIDs.get(i) == ID.EnemyBlackRook) {
                         s.update(elapsed);
 
                         //region Gravity and ground collision
-                        if(isOnGround(s, tmap) && s.getVelocityY() >= 0) {
+                        if(isOnGround(s, tMap) && s.getVelocityY() >= 0) {
                             //Stops s from falling
                             s.setVelocityY(0);
 
                             //Gets the number of tiles across and down the bottom-left corner of s is
-                            int ytile = (int) ((s.getY() + s.getHeight()) / tmap.getTileHeight());
+                            int yTile = (int) ((s.getY() + s.getHeight()) / tMap.getTileHeight());
 
                             //Moves s just out of the tile it landed on so there is no overlap
-                            s.setY(tmap.getTileYC(0, ytile) - s.getHeight());
+                            s.setY(tMap.getTileYC(0, yTile) - s.getHeight());
                         }
                         else {
                             //Makes s fall
@@ -1334,7 +1330,7 @@ public class Game extends GameCore implements MouseListener {
                         }
                         //endregion
 
-                        handleTileCollision(s, tmap, spriteIDs.get(i));
+                        handleTileCollision(s, tMap, spriteIDs.get(i));
 
                         if(whiteKnight.getX() + whiteKnight.getWidth() / 2f > s.getX() + s.getWidth() / 2f) {
                             s.setVelocityX(0.075f);
