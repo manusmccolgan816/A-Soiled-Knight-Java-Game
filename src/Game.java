@@ -33,8 +33,10 @@ public class Game extends GameCore implements MouseListener {
     private boolean canJump;
     private boolean isFacingRight;
     private boolean isRecovering;
+    private boolean isHappyBlockActivated;
 
     private long recoveryTimer;
+    private long happyBlockTimer;
 
     private Animation whiteKnightIdleRight;
     private Animation whiteKnightIdleLeft;
@@ -61,6 +63,8 @@ public class Game extends GameCore implements MouseListener {
     public static final ArrayList<Character> damageChars = new ArrayList<>(
             Arrays.asList('s')
     );
+    public static final char happyBlockChar = ')';
+    public static final char sadBlockChar = '(';
 
     private Menu menu;
     private Controls controls;
@@ -227,6 +231,7 @@ public class Game extends GameCore implements MouseListener {
         canJump = true;
         isFacingRight = true;
         isRecovering = false;
+        isHappyBlockActivated = false;
 
         recoveryTimer = 0;
     }
