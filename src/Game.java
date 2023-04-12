@@ -33,10 +33,8 @@ public class Game extends GameCore implements MouseListener {
     private boolean canJump;
     private boolean isFacingRight;
     private boolean isRecovering;
-    private boolean isHappyBlockActivated;
 
     private long recoveryTimer;
-    private long happyBlockTimer;
 
     private Animation whiteKnightIdleRight;
     private Animation whiteKnightIdleLeft;
@@ -55,16 +53,19 @@ public class Game extends GameCore implements MouseListener {
     private Sprite whiteKnight = null;
 
     private final TileMap tMap = new TileMap();
-    public static final char horseShoeChar = 'e';
-    public static final char heartChar = 'h';
-    public static final ArrayList<Character> backgroundChars = new ArrayList<>(
-            Arrays.asList('.', horseShoeChar, heartChar, 'b', 'm', 't')
+    public static final char HORSE_SHOE_CHAR = 'e';
+    public static final char HEART_CHAR = 'h';
+    public static final ArrayList<Character> BACKGROUND_CHARS = new ArrayList<>(
+            Arrays.asList('.', HORSE_SHOE_CHAR, HEART_CHAR, 'b', 'm', 't')
     );
-    public static final ArrayList<Character> damageChars = new ArrayList<>(
+    public static final ArrayList<Character> DAMAGE_CHARS = new ArrayList<>(
             Arrays.asList('s')
     );
-    public static final char happyBlockChar = ')';
-    public static final char sadBlockChar = '(';
+    public static final char HAPPY_BLOCK_CHAR = ')';
+    public static final char SAD_BLOCK_CHAR = '(';
+
+    private ArrayList<DisappearingTile> stoodOnDisappearingTiles;
+    private ArrayList<DisappearingTile> tilesToReload;
 
     private Menu menu;
     private Controls controls;
@@ -171,6 +172,9 @@ public class Game extends GameCore implements MouseListener {
         //Initialise the player with an animation
         whiteKnight = new Sprite(whiteKnightIdleRight);
 
+        stoodOnDisappearingTiles = new ArrayList<>();
+        tilesToReload = new ArrayList<>();
+
         initialiseGame();
         goToNextLevel();
     }
@@ -231,7 +235,6 @@ public class Game extends GameCore implements MouseListener {
         canJump = true;
         isFacingRight = true;
         isRecovering = false;
-        isHappyBlockActivated = false;
 
         recoveryTimer = 0;
     }
@@ -325,8 +328,8 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Checks if a sprite is on the ground.
      *
-     * @param s    The sprite to check
-     * @param tMap The tilemap to check
+     * @param s The Sprite to check
+     * @param tMap The TileMap to check
      * @return true if s is on a ground tile
      */
     public boolean isOnGround(Sprite s, TileMap tMap) {
@@ -345,7 +348,7 @@ public class Game extends GameCore implements MouseListener {
         char ch = tMap.getTileChar(xTile, yTile);
 
         //If it's a ground tile
-        if (!backgroundChars.contains(ch)) {
+        if (!BACKGROUND_CHARS.contains(ch)) {
             return true;
         }
 
@@ -356,7 +359,45 @@ public class Game extends GameCore implements MouseListener {
         ch = tMap.getTileChar(xTile, yTile);
 
         //Return true if it is a ground tile, false if not
-        return !backgroundChars.contains(ch);
+        return !BACKGROUND_CHARS.contains(ch);
+    }
+
+    /**
+     * Checks if a sprite is on a tile of the given tileChar in the given position.
+     *
+     * @param s The Sprite to check
+     * @param tMap The TileMap to check
+     * @param tileChar The type of tile
+     * @param xPos The tile's x position
+     * @param yPos The tile's y position
+     * @return true if s is on the given tile, false if not
+     */
+    public boolean isOnTileAtPosition(Sprite s, TileMap tMap, char tileChar, int xPos, int yPos) {
+        //Take a note of a sprite's current position
+        float sx = s.getX();
+        float sy = s.getY();
+
+        //Find out how wide and how tall a tile is
+        float tileWidth = tMap.getTileWidth();
+        float tileHeight = tMap.getTileHeight();
+
+        //Gets the number of tiles across and down the bottom-left corner of s is, 6 pixels in to avoid side-on
+        //collisions being detected
+        int xTile = (int) ((sx + 6) / tileWidth);
+        int yTile = (int) ((sy + s.getHeight()) / tileHeight);
+        char ch = tMap.getTileChar(xTile, yTile);
+
+        if (ch == tileChar && xTile == xPos && yTile == yPos) {
+            return true;
+        }
+
+        //Gets the number of tiles across and down the bottom-right corner of s is, 6 pixels in to avoid side-on
+        //collisions being detected
+        xTile = (int) ((sx + s.getWidth() - 6) / tileWidth);
+        yTile = (int) ((sy + s.getHeight()) / tileHeight);
+        ch = tMap.getTileChar(xTile, yTile);
+
+        return ch == tileChar && xTile == xPos && yTile == yPos;
     }
 
     /**
@@ -388,10 +429,10 @@ public class Game extends GameCore implements MouseListener {
         //The tile character at the top left of sprite s
         char ch = tMap.getTileChar(xTile, yTile);
 
-        if (!backgroundChars.contains(ch)) {
+        if (!BACKGROUND_CHARS.contains(ch)) {
             if (isOnGround(s, tMap) || sx >= tMap.getTileXC(xTile, yTile) + tileWidth - 6) {
                 if (id == ID.Player) {
-                    if (damageChars.contains(ch)) {
+                    if (DAMAGE_CHARS.contains(ch)) {
                         //If the player isn't recovering...
                         if (!isRecovering) {
                             //If the player died, return
@@ -432,10 +473,10 @@ public class Game extends GameCore implements MouseListener {
         yTile = (int) (sy / tileHeight);
         ch = tMap.getTileChar(xTile, yTile);
 
-        if (!backgroundChars.contains(ch)) {
+        if (!BACKGROUND_CHARS.contains(ch)) {
             if (isOnGround(s, tMap) || sx + s.getWidth() <= tMap.getTileXC(xTile, yTile) + 6) {
                 if (id == ID.Player) {
-                    if (damageChars.contains(ch)) {
+                    if (DAMAGE_CHARS.contains(ch)) {
                         //If the player isn't recovering...
                         if (!isRecovering) {
                             //If the player died, return
@@ -478,9 +519,9 @@ public class Game extends GameCore implements MouseListener {
             yTile = (int) ((sy + (s.getHeight() / 2)) / tileHeight);
             ch = tMap.getTileChar(xTile, yTile);
 
-            if (!backgroundChars.contains(ch)) {
+            if (!BACKGROUND_CHARS.contains(ch)) {
                 if (id == ID.Player) {
-                    if (damageChars.contains(ch)) {
+                    if (DAMAGE_CHARS.contains(ch)) {
                         //If the player isn't recovering...
                         if (!isRecovering) {
                             //If the player died, return
@@ -509,9 +550,9 @@ public class Game extends GameCore implements MouseListener {
             yTile = (int) ((sy + s.getHeight() / 2) / tileHeight);
             ch = tMap.getTileChar(xTile, yTile);
 
-            if (!backgroundChars.contains(ch)) {
+            if (!BACKGROUND_CHARS.contains(ch)) {
                 if (id == ID.Player) {
-                    if (damageChars.contains(ch)) {
+                    if (DAMAGE_CHARS.contains(ch)) {
                         if (!isRecovering) {
                             //If the player died, return
                             if (handleDamageCollision()) return;
@@ -539,13 +580,14 @@ public class Game extends GameCore implements MouseListener {
         yTile = (int) ((sy + s.getHeight()) / tileHeight);
         ch = tMap.getTileChar(xTile, yTile);
 
-        if (!backgroundChars.contains(ch)) {
-            if (damageChars.contains(ch) && id == ID.Player) {
+        if (!BACKGROUND_CHARS.contains(ch)) {
+            if (DAMAGE_CHARS.contains(ch) && id == ID.Player) {
                 if (!isRecovering) {
                     //If the player died, return
                     if (handleDamageCollision()) return;
                 }
             }
+
             if (!isOnGround(s, tMap)) {
                 if (id == ID.Player) {
                     //Stop horizontal movement
@@ -557,6 +599,8 @@ public class Game extends GameCore implements MouseListener {
 
                 //Moves s just out of the tile it moved into so there is no overlap
                 s.setX(tMap.getTileXC(xTile, yTile) + tileWidth);
+            } else {
+                checkHandleHappyBlockCollision(tMap, id, xTile, yTile, ch);
             }
         }
         //If s is the player and collided with a horse shoe or heart
@@ -571,13 +615,14 @@ public class Game extends GameCore implements MouseListener {
         yTile = (int) ((sy + s.getHeight()) / tileHeight);
         ch = tMap.getTileChar(xTile, yTile);
 
-        if (!backgroundChars.contains(ch)) {
-            if (damageChars.contains(ch) && id == ID.Player) {
+        if (!BACKGROUND_CHARS.contains(ch)) {
+            if (DAMAGE_CHARS.contains(ch) && id == ID.Player) {
                 if (!isRecovering) {
                     //If the player died, return
                     if (handleDamageCollision()) return;
                 }
             }
+
             if (!isOnGround(s, tMap)) {
                 if (id == ID.Player) {
                     //Stop horizontal movement
@@ -588,6 +633,8 @@ public class Game extends GameCore implements MouseListener {
 
                 //Moves s just out of the tile it moved into so there is no overlap
                 s.setX(tMap.getTileXC(xTile, yTile) - s.getWidth() - 0.1f);
+            } else {
+                checkHandleHappyBlockCollision(tMap, id, xTile, yTile, ch);
             }
         }
         //If s is the player and collided with a horse shoe or heart
@@ -596,6 +643,24 @@ public class Game extends GameCore implements MouseListener {
             checkHandleHeartCollision(tMap, id, xTile, yTile, ch);
         }
         //endregion
+
+        if (id == ID.Player) {
+            ArrayList<DisappearingTile> tilesToRemove = new ArrayList<>();
+
+            for (DisappearingTile disappearingTile : stoodOnDisappearingTiles) {
+                //If s is not standing on this tile
+                if (!isOnTileAtPosition(s, tMap, SAD_BLOCK_CHAR, disappearingTile.getXC(), disappearingTile.getYC())) {
+                    tilesToRemove.add(disappearingTile);
+                }
+            }
+
+            for (DisappearingTile disappearingTile : tilesToRemove) {
+                //Make the tile disappear
+                tMap.setTileChar(HAPPY_BLOCK_CHAR, disappearingTile.getXC(), disappearingTile.getYC());
+
+                stoodOnDisappearingTiles.remove(disappearingTile);
+            }
+        }
 
         if (reverseVelX) {
             s.setVelocityX(-s.getVelocityX()); //Reverse the sprite's movement
@@ -611,7 +676,7 @@ public class Game extends GameCore implements MouseListener {
     }
 
     private void checkHandleHorseShoeCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
-        if (ch == horseShoeChar && id == ID.Player) {
+        if (ch == HORSE_SHOE_CHAR && id == ID.Player) {
             new Sound(pickupHorseshoeSoundFilepath).start();
 
             tMap.setTileChar('.', xTile, yTile); //Change the horse shoe to empty space
@@ -625,8 +690,46 @@ public class Game extends GameCore implements MouseListener {
         }
     }
 
+    private void checkHandleHappyBlockCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
+        if (ch == HAPPY_BLOCK_CHAR && id == ID.Player) {
+            for (DisappearingTile disappearingTile : stoodOnDisappearingTiles) {
+                //Do nothing if the tile is already recognised as being stood on
+                if (disappearingTile.getXC() == xTile && disappearingTile.getYC() == yTile) {
+                    return;
+                }
+            }
+
+            //Change tile to sad face tile when it is stood on
+            tMap.setTileChar(SAD_BLOCK_CHAR, xTile, yTile);
+
+            //Recognise this tile as being stood on and start a timer
+            DisappearingTile currentDisappearingTile = new DisappearingTile(HAPPY_BLOCK_CHAR, xTile, yTile);
+            currentDisappearingTile.startStoodOnTimer();
+            stoodOnDisappearingTiles.add(currentDisappearingTile);
+        }
+    }
+
+    private void checkHandleHappyBlockStatuses(long pauseTimer) {
+        ArrayList<DisappearingTile> tilesToRemove = new ArrayList<>();
+
+        for (DisappearingTile disappearingTile : stoodOnDisappearingTiles) {
+            long elapsedTimeSinceTileStoodOn = (System.nanoTime() - disappearingTile.getStoodOnTimer()) / 1000000;
+
+            if (elapsedTimeSinceTileStoodOn > DisappearingTile.TIME_TO_BREAK + (pauseTimer / 1000000)) {
+                tilesToRemove.add(disappearingTile);
+            }
+        }
+
+        for (DisappearingTile disappearingTile : tilesToRemove) {
+            //Make the tile disappear
+            tMap.setTileChar('.', disappearingTile.getXC(), disappearingTile.getYC());
+
+            stoodOnDisappearingTiles.remove(disappearingTile);
+        }
+    }
+
     private void checkHandleHeartCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
-        if (ch == heartChar && id == ID.Player) {
+        if (ch == HEART_CHAR && id == ID.Player) {
             new Sound(healthUpSoundFilepath).start();
 
             tMap.setTileChar('.', xTile, yTile);
@@ -689,7 +792,7 @@ public class Game extends GameCore implements MouseListener {
             Image imgBackground = loadImage("images/RollingHillsResized.png");
 
             //Initialise the HUD, giving the max health for the level and the number of horse shoes to collect
-            hud = new HUD(this,4, 4, 0, countHorseShoesInMap(tMap));
+            hud = new HUD(this, 4, 4, 0, countHorseShoesInMap(tMap));
 
             //Set the position of the player
             whiteKnight.setPosition(tMap.getTileXC(6, 0), tMap.getTileYC(0, 8));
@@ -740,7 +843,7 @@ public class Game extends GameCore implements MouseListener {
             //Load the background image
             Image imgBackground = loadImage("images/RollingHillsResized.png");
 
-            hud = new HUD(this,4, 4, 0, countHorseShoesInMap(tMap));
+            hud = new HUD(this, 4, 4, 0, countHorseShoesInMap(tMap));
 
             whiteKnight.setPosition(tMap.getTileXC(4, 0), tMap.getTileYC(0, 17));
             sprites.add(whiteKnight);
@@ -813,8 +916,7 @@ public class Game extends GameCore implements MouseListener {
                 isPaused = true;
                 isJustPaused = true;
             }
-        }
-        else if (key == KeyEvent.VK_M) {
+        } else if (key == KeyEvent.VK_M) {
             isDebugModeOn = !isDebugModeOn;
         }
 
@@ -899,7 +1001,7 @@ public class Game extends GameCore implements MouseListener {
                 tileChar = tMap.getTileChar(i, j);
 
                 //Increment numHorseShoes if a horse shoe is found
-                if (tileChar == horseShoeChar)
+                if (tileChar == HORSE_SHOE_CHAR)
                     numHorseShoes++;
             }
         }
@@ -1453,6 +1555,8 @@ public class Game extends GameCore implements MouseListener {
                             else whiteKnight.setAnimation(whiteKnightIdleLeft);
                         }
                     }
+
+                    checkHandleHappyBlockStatuses(pauseTimer);
                 }
             }
         }
