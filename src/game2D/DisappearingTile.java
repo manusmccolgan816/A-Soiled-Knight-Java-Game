@@ -3,7 +3,10 @@ package game2D;
 public class DisappearingTile extends Tile {
 
     public static final int TIME_TO_BREAK = 2000;
+    public static final int TIME_TO_REAPPEAR = 6000;
+
     private long stoodOnTimer;
+    private long reloadTimer;
     private long pauseTimer;
     private long lastPauseTimer;
 
@@ -17,6 +20,7 @@ public class DisappearingTile extends Tile {
     public DisappearingTile(char c, int x, int y) {
         super(c, x, y);
 
+        reloadTimer = 0;
         pauseTimer = 0;
         lastPauseTimer = 0;
     }
@@ -31,6 +35,18 @@ public class DisappearingTile extends Tile {
 
     public void setStoodOnTimer(long stoodOnTimer) {
         this.stoodOnTimer = stoodOnTimer;
+    }
+
+    public void startReloadTimer() {
+        reloadTimer = System.nanoTime();
+    }
+
+    public long getReloadTimer() {
+        return reloadTimer;
+    }
+
+    public void setReloadTimer(long reloadTimer) {
+        this.reloadTimer = reloadTimer;
     }
 
     public long getPauseTimer() {

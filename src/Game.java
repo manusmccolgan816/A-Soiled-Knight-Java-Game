@@ -328,7 +328,7 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Checks if a sprite is on the ground.
      *
-     * @param s The Sprite to check
+     * @param s    The Sprite to check
      * @param tMap The TileMap to check
      * @return true if s is on a ground tile
      */
@@ -365,11 +365,11 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Checks if a sprite is on a tile of the given tileChar in the given position.
      *
-     * @param s The Sprite to check
-     * @param tMap The TileMap to check
+     * @param s        The Sprite to check
+     * @param tMap     The TileMap to check
      * @param tileChar The type of tile
-     * @param xPos The tile's x position
-     * @param yPos The tile's y position
+     * @param xPos     The tile's x position
+     * @param yPos     The tile's y position
      * @return true if s is on the given tile, false if not
      */
     public boolean isOnTileAtPosition(Sprite s, TileMap tMap, char tileChar, int xPos, int yPos) {
@@ -678,11 +678,11 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Checks for and handles a collision with a horse shoe.
      *
-     * @param tMap The TileMap to check
-     * @param id The type of Sprite that has collided with the tile
+     * @param tMap  The TileMap to check
+     * @param id    The type of Sprite that has collided with the tile
      * @param xTile The x position of the tile
      * @param yTile The y position of the tile
-     * @param ch The type of tile
+     * @param ch    The type of tile
      */
     private void checkHandleHorseShoeCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
         if (ch == HORSE_SHOE_CHAR && id == ID.Player) {
@@ -702,11 +702,11 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Checks for and handles a collision with a disappearing tile.
      *
-     * @param tMap The TileMap to check
-     * @param id The type of Sprite that has collided with the tile
+     * @param tMap  The TileMap to check
+     * @param id    The type of Sprite that has collided with the tile
      * @param xTile The x position of the tile
      * @param yTile The y position of the tile
-     * @param ch The type of tile
+     * @param ch    The type of tile
      */
     private void checkHandleDisappearingTileCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
         if (ch == HAPPY_BLOCK_CHAR && id == ID.Player) {
@@ -730,11 +730,11 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Checks for and handles a collision with a heart tile.
      *
-     * @param tMap The TileMap to check
-     * @param id The type of Sprite that has collided with the tile
+     * @param tMap  The TileMap to check
+     * @param id    The type of Sprite that has collided with the tile
      * @param xTile The x position of the tile
      * @param yTile The y position of the tile
-     * @param ch The type of tile
+     * @param ch    The type of tile
      */
     private void checkHandleHeartCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
         if (ch == HEART_CHAR && id == ID.Player) {
@@ -1202,6 +1202,14 @@ public class Game extends GameCore implements MouseListener {
                         }
                         disappearingTile.setPauseTimer(System.nanoTime());
                     }
+                    for (DisappearingTile disappearingTile : tilesToReload) {
+                        //If the game is being paused for the second (third, ... onward) time since this tile was stood on...
+                        if (disappearingTile.getPauseTimer() != 0) {
+                            //Assign the previous length of time paused for to the tile's pauseTimer
+                            disappearingTile.setLastPauseTimer(disappearingTile.getPauseTimer());
+                        }
+                        disappearingTile.setPauseTimer(System.nanoTime());
+                    }
                     //Start the pause timer
                     pauseTimer = System.nanoTime();
 
@@ -1239,6 +1247,10 @@ public class Game extends GameCore implements MouseListener {
                 //If this is the first call of Level.update() since the resume button was pressed...
                 if (isJustResumed) {
                     for (DisappearingTile disappearingTile : stoodOnDisappearingTiles) {
+                        disappearingTile.setPauseTimer(System.nanoTime() - disappearingTile.getPauseTimer());
+                        disappearingTile.setPauseTimer(disappearingTile.getPauseTimer() + disappearingTile.getLastPauseTimer());
+                    }
+                    for (DisappearingTile disappearingTile : tilesToReload) {
                         disappearingTile.setPauseTimer(System.nanoTime() - disappearingTile.getPauseTimer());
                         disappearingTile.setPauseTimer(disappearingTile.getPauseTimer() + disappearingTile.getLastPauseTimer());
                     }
@@ -1335,8 +1347,7 @@ public class Game extends GameCore implements MouseListener {
                         //endregion
 
                         handleTileCollision(s, tMap, ID.Player);
-                    }
-                    else if (spriteIDs.get(i) == ID.EnemyBlackKnight) {
+                    } else if (spriteIDs.get(i) == ID.EnemyBlackKnight) {
                         Random rnd = new Random();
 
                         s.update(elapsed);
@@ -1386,8 +1397,7 @@ public class Game extends GameCore implements MouseListener {
                         //endregion
 
                         handleTileCollision(s, tMap, spriteIDs.get(i));
-                    }
-                    else if (spriteIDs.get(i) == ID.EnemyBlackPawn) {
+                    } else if (spriteIDs.get(i) == ID.EnemyBlackPawn) {
                         s.update(elapsed);
 
                         //region Gravity and ground collision
@@ -1407,8 +1417,7 @@ public class Game extends GameCore implements MouseListener {
                         //endregion
 
                         handleTileCollision(s, tMap, spriteIDs.get(i));
-                    }
-                    else if (spriteIDs.get(i) == ID.EnemyBlackRook) {
+                    } else if (spriteIDs.get(i) == ID.EnemyBlackRook) {
                         s.update(elapsed);
 
                         //region Gravity and ground collision
@@ -1580,7 +1589,8 @@ public class Game extends GameCore implements MouseListener {
                         }
                     }
 
-                    checkHandleDisappearingTileStatuses(tMap);
+                    makeTilesDisappearAsAppropriate(tMap);
+                    makeTilesReappearAsAppropriate(tMap);
                 }
             }
         }
@@ -1589,15 +1599,16 @@ public class Game extends GameCore implements MouseListener {
          * Checks the statuses of the disappearing tiles and makes them disappear if
          * the player has stood on them for too long.
          *
-         * @param tMap The TileMap to check
+         * @param tMap The TileMap the tiles belong to
          */
-        private void checkHandleDisappearingTileStatuses(TileMap tMap) {
+        private void makeTilesDisappearAsAppropriate(TileMap tMap) {
             ArrayList<DisappearingTile> tilesToRemove = new ArrayList<>();
 
             for (DisappearingTile disappearingTile : stoodOnDisappearingTiles) {
                 long elapsedTimeSinceTileStoodOn = (System.nanoTime() - disappearingTile.getStoodOnTimer()) / 1000000;
 
-                if (elapsedTimeSinceTileStoodOn > DisappearingTile.TIME_TO_BREAK + (disappearingTile.getPauseTimer() / 1000000)) {
+                if (elapsedTimeSinceTileStoodOn > DisappearingTile.TIME_TO_BREAK
+                        + (disappearingTile.getPauseTimer() / 1000000)) {
                     tilesToRemove.add(disappearingTile);
 
                     disappearingTile.setStoodOnTimer(0);
@@ -1611,7 +1622,47 @@ public class Game extends GameCore implements MouseListener {
                 tMap.setTileChar('.', disappearingTile.getXC(), disappearingTile.getYC());
 
                 stoodOnDisappearingTiles.remove(disappearingTile);
+
+                //Add this tile to the list of tiles that will reappear after a period of time
+                disappearingTile.startReloadTimer();
+                tilesToReload.add(disappearingTile);
+            }
+        }
+
+        /**
+         * Checks how long the since the tiles that have disappeared were
+         * removed and makes them reappear if it exceeds a specified length
+         * of time.
+         *
+         * @param tMap The TileMap the tiles belong to
+         */
+        private void makeTilesReappearAsAppropriate(TileMap tMap) {
+            ArrayList<DisappearingTile> tilesToAdd = new ArrayList<>();
+
+            for (DisappearingTile disappearingTile : tilesToReload) {
+                long elapsedTimeSinceDisappeared = (System.nanoTime() - disappearingTile.getReloadTimer()) / 1000000;
+
+                if (elapsedTimeSinceDisappeared > DisappearingTile.TIME_TO_REAPPEAR +
+                        (disappearingTile.getPauseTimer() / 1000000)) {
+                    tilesToAdd.add(disappearingTile);
+
+                    disappearingTile.setReloadTimer(0);
+                    disappearingTile.setPauseTimer(0);
+                    disappearingTile.setLastPauseTimer(0);
+                }
+            }
+
+            for (DisappearingTile disappearingTile : tilesToAdd) {
+                //Make the tile disappear
+                tMap.setTileChar(HAPPY_BLOCK_CHAR, disappearingTile.getXC(), disappearingTile.getYC());
+
+                tilesToReload.remove(disappearingTile);
             }
         }
     }
 }
+
+
+
+
+
