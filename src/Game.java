@@ -600,7 +600,7 @@ public class Game extends GameCore implements MouseListener {
                 //Moves s just out of the tile it moved into so there is no overlap
                 s.setX(tMap.getTileXC(xTile, yTile) + tileWidth);
             } else {
-                checkHandleHappyBlockCollision(tMap, id, xTile, yTile, ch);
+                checkHandleDisappearingTileCollision(tMap, id, xTile, yTile, ch);
             }
         }
         //If s is the player and collided with a horse shoe or heart
@@ -634,7 +634,7 @@ public class Game extends GameCore implements MouseListener {
                 //Moves s just out of the tile it moved into so there is no overlap
                 s.setX(tMap.getTileXC(xTile, yTile) - s.getWidth() - 0.1f);
             } else {
-                checkHandleHappyBlockCollision(tMap, id, xTile, yTile, ch);
+                checkHandleDisappearingTileCollision(tMap, id, xTile, yTile, ch);
             }
         }
         //If s is the player and collided with a horse shoe or heart
@@ -675,6 +675,15 @@ public class Game extends GameCore implements MouseListener {
         }
     }
 
+    /**
+     * Checks for and handles a collision with a horse shoe.
+     *
+     * @param tMap The TileMap to check
+     * @param id The type of Sprite that has collided with the tile
+     * @param xTile The x position of the tile
+     * @param yTile The y position of the tile
+     * @param ch The type of tile
+     */
     private void checkHandleHorseShoeCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
         if (ch == HORSE_SHOE_CHAR && id == ID.Player) {
             new Sound(pickupHorseshoeSoundFilepath).start();
@@ -690,7 +699,16 @@ public class Game extends GameCore implements MouseListener {
         }
     }
 
-    private void checkHandleHappyBlockCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
+    /**
+     * Checks for and handles a collision with a disappearing tile.
+     *
+     * @param tMap The TileMap to check
+     * @param id The type of Sprite that has collided with the tile
+     * @param xTile The x position of the tile
+     * @param yTile The y position of the tile
+     * @param ch The type of tile
+     */
+    private void checkHandleDisappearingTileCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
         if (ch == HAPPY_BLOCK_CHAR && id == ID.Player) {
             for (DisappearingTile disappearingTile : stoodOnDisappearingTiles) {
                 //Do nothing if the tile is already recognised as being stood on
@@ -709,25 +727,15 @@ public class Game extends GameCore implements MouseListener {
         }
     }
 
-    private void checkHandleHappyBlockStatuses(long pauseTimer) {
-        ArrayList<DisappearingTile> tilesToRemove = new ArrayList<>();
-
-        for (DisappearingTile disappearingTile : stoodOnDisappearingTiles) {
-            long elapsedTimeSinceTileStoodOn = (System.nanoTime() - disappearingTile.getStoodOnTimer()) / 1000000;
-
-            if (elapsedTimeSinceTileStoodOn > DisappearingTile.TIME_TO_BREAK + (pauseTimer / 1000000)) {
-                tilesToRemove.add(disappearingTile);
-            }
-        }
-
-        for (DisappearingTile disappearingTile : tilesToRemove) {
-            //Make the tile disappear
-            tMap.setTileChar('.', disappearingTile.getXC(), disappearingTile.getYC());
-
-            stoodOnDisappearingTiles.remove(disappearingTile);
-        }
-    }
-
+    /**
+     * Checks for and handles a collision with a heart tile.
+     *
+     * @param tMap The TileMap to check
+     * @param id The type of Sprite that has collided with the tile
+     * @param xTile The x position of the tile
+     * @param yTile The y position of the tile
+     * @param ch The type of tile
+     */
     private void checkHandleHeartCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
         if (ch == HEART_CHAR && id == ID.Player) {
             new Sound(healthUpSoundFilepath).start();
@@ -1186,6 +1194,14 @@ public class Game extends GameCore implements MouseListener {
                         //Assign the previous length of time paused for to lastPauseTimer
                         lastPauseTimer = pauseTimer;
                     }
+                    for (DisappearingTile disappearingTile : stoodOnDisappearingTiles) {
+                        //If the game is being paused for the second (third, ... onward) time since this tile was stood on...
+                        if (disappearingTile.getPauseTimer() != 0) {
+                            //Assign the previous length of time paused for to the tile's pauseTimer
+                            disappearingTile.setLastPauseTimer(disappearingTile.getPauseTimer());
+                        }
+                        disappearingTile.setPauseTimer(System.nanoTime());
+                    }
                     //Start the pause timer
                     pauseTimer = System.nanoTime();
 
@@ -1222,6 +1238,11 @@ public class Game extends GameCore implements MouseListener {
             } else {
                 //If this is the first call of Level.update() since the resume button was pressed...
                 if (isJustResumed) {
+                    for (DisappearingTile disappearingTile : stoodOnDisappearingTiles) {
+                        disappearingTile.setPauseTimer(System.nanoTime() - disappearingTile.getPauseTimer());
+                        disappearingTile.setPauseTimer(disappearingTile.getPauseTimer() + disappearingTile.getLastPauseTimer());
+                    }
+
                     //Get the time paused for
                     pauseTimer = (System.nanoTime() - pauseTimer);
                     //Add the previous time(s) paused for to pauseTimer
@@ -1314,7 +1335,8 @@ public class Game extends GameCore implements MouseListener {
                         //endregion
 
                         handleTileCollision(s, tMap, ID.Player);
-                    } else if (spriteIDs.get(i) == ID.EnemyBlackKnight) {
+                    }
+                    else if (spriteIDs.get(i) == ID.EnemyBlackKnight) {
                         Random rnd = new Random();
 
                         s.update(elapsed);
@@ -1364,7 +1386,8 @@ public class Game extends GameCore implements MouseListener {
                         //endregion
 
                         handleTileCollision(s, tMap, spriteIDs.get(i));
-                    } else if (spriteIDs.get(i) == ID.EnemyBlackPawn) {
+                    }
+                    else if (spriteIDs.get(i) == ID.EnemyBlackPawn) {
                         s.update(elapsed);
 
                         //region Gravity and ground collision
@@ -1384,7 +1407,8 @@ public class Game extends GameCore implements MouseListener {
                         //endregion
 
                         handleTileCollision(s, tMap, spriteIDs.get(i));
-                    } else if (spriteIDs.get(i) == ID.EnemyBlackRook) {
+                    }
+                    else if (spriteIDs.get(i) == ID.EnemyBlackRook) {
                         s.update(elapsed);
 
                         //region Gravity and ground collision
@@ -1556,8 +1580,37 @@ public class Game extends GameCore implements MouseListener {
                         }
                     }
 
-                    checkHandleHappyBlockStatuses(pauseTimer);
+                    checkHandleDisappearingTileStatuses(tMap);
                 }
+            }
+        }
+
+        /**
+         * Checks the statuses of the disappearing tiles and makes them disappear if
+         * the player has stood on them for too long.
+         *
+         * @param tMap The TileMap to check
+         */
+        private void checkHandleDisappearingTileStatuses(TileMap tMap) {
+            ArrayList<DisappearingTile> tilesToRemove = new ArrayList<>();
+
+            for (DisappearingTile disappearingTile : stoodOnDisappearingTiles) {
+                long elapsedTimeSinceTileStoodOn = (System.nanoTime() - disappearingTile.getStoodOnTimer()) / 1000000;
+
+                if (elapsedTimeSinceTileStoodOn > DisappearingTile.TIME_TO_BREAK + (disappearingTile.getPauseTimer() / 1000000)) {
+                    tilesToRemove.add(disappearingTile);
+
+                    disappearingTile.setStoodOnTimer(0);
+                    disappearingTile.setPauseTimer(0);
+                    disappearingTile.setLastPauseTimer(0);
+                }
+            }
+
+            for (DisappearingTile disappearingTile : tilesToRemove) {
+                //Make the tile disappear
+                tMap.setTileChar('.', disappearingTile.getXC(), disappearingTile.getYC());
+
+                stoodOnDisappearingTiles.remove(disappearingTile);
             }
         }
     }
