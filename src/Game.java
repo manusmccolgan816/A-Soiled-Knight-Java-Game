@@ -74,6 +74,7 @@ public class Game extends GameCore implements MouseListener {
     private Completed completed;
     private Level level1;
     private Level level2;
+    private Level level3;
 
     private PlayMIDI backgroundSong;
 
@@ -281,6 +282,8 @@ public class Game extends GameCore implements MouseListener {
                 level1.draw(g);
             } else if (currentLevel == 2) {
                 level2.draw(g);
+            } else if (currentLevel == 3) {
+                level3.draw(g);
             }
             hud.draw(g);
         } else if (gameState == STATE.GameOver) {
@@ -303,6 +306,8 @@ public class Game extends GameCore implements MouseListener {
                 level1.update(elapsed);
             } else if (currentLevel == 2) {
                 level2.update(elapsed);
+            } else if (currentLevel == 3) {
+                level3.update(elapsed);
             }
         } else if (gameState == STATE.GameOver) {
             gameOver.update(elapsed);
@@ -899,6 +904,53 @@ public class Game extends GameCore implements MouseListener {
 
             level2 = new Level(sprites, spriteIDs, tMap, imgBackground);
             currentLevel = 2;
+        } else if (currentLevel == 2) {
+            //Load the tile map
+            tMap.loadMap("maps", "Level3Map.txt");
+
+            //Load the background image
+            Image imgBackground = loadImage("images/RollingHillsResized.png");
+
+            hud = new HUD(this, 4, 4, 0, countHorseShoesInMap(tMap));
+
+            whiteKnight.setPosition(tMap.getTileXC(4, 0), tMap.getTileYC(0, 12));
+            sprites.add(whiteKnight);
+            spriteIDs.add(ID.Player);
+
+            Sprite blackKnight1 = new Sprite(blackKnightBobbingLeft);
+            blackKnight1.show();
+            blackKnight1.setPosition(tMap.getTileXC(6, 0), tMap.getTileYC(0, 18));
+            sprites.add(blackKnight1);
+            spriteIDs.add(ID.EnemyBlackKnight);
+
+            Sprite blackRook1 = new Sprite(blackRookIdle);
+            blackRook1.show();
+            blackRook1.setPosition(tMap.getTileXC(25, 0), tMap.getTileYC(0, 18));
+            sprites.add(blackRook1);
+            spriteIDs.add(ID.EnemyBlackRook);
+
+            Sprite blackPawn1 = new Sprite(blackPawnBob);
+            blackPawn1.show();
+            blackPawn1.setPosition(tMap.getTileXC(33, 0), tMap.getTileYC(0, 16));
+            blackPawn1.setVelocityX(0.2f);
+            sprites.add(blackPawn1);
+            spriteIDs.add(ID.EnemyBlackPawn);
+
+            Sprite blackRook2 = new Sprite(blackRookIdle);
+            blackRook2.show();
+            blackRook2.setPosition(tMap.getTileXC(64, 0), tMap.getTileYC(0, 14));
+            sprites.add(blackRook2);
+            spriteIDs.add(ID.EnemyBlackRook);
+
+            backgroundSong = new PlayMIDI();
+            try {
+                backgroundSong.play("sounds/StoneTower.mid");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            level3 = new Level(sprites, spriteIDs, tMap, imgBackground);
+            currentLevel = 3;
         } else {
             initialiseCompleted();
             return;

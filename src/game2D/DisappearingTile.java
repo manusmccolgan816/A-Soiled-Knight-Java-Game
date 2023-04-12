@@ -1,5 +1,9 @@
 package game2D;
 
+/**
+ * This is a Tile that disappears after a being stood on for a period
+ * of time and then reappears after another set period of time.
+ */
 public class DisappearingTile extends Tile {
 
     public static final int TIME_TO_BREAK = 2000;
