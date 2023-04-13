@@ -200,7 +200,7 @@ public class Game extends GameCore implements MouseListener {
     }
 
     /**
-     * Called to display controls screen.
+     * Displays controls screen.
      */
     public void initialiseControls() {
         controls = new Controls(this);
@@ -241,7 +241,7 @@ public class Game extends GameCore implements MouseListener {
     }
 
     /**
-     * Called to display the game over screen.
+     * Displays the game over screen.
      */
     public void initialiseGameOver() {
         backgroundSong.stop();
@@ -255,7 +255,7 @@ public class Game extends GameCore implements MouseListener {
     }
 
     /**
-     * Called to display the game completed screen.
+     * Displays the game completed screen.
      */
     public void initialiseCompleted() {
         backgroundSong.stop();
@@ -333,7 +333,7 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Checks if a sprite is on the ground.
      *
-     * @param s    The Sprite to check
+     * @param s The Sprite to check
      * @param tMap The TileMap to check
      * @return true if s is on a ground tile
      */
@@ -370,11 +370,11 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Checks if a sprite is on a tile of the given tileChar in the given position.
      *
-     * @param s        The Sprite to check
-     * @param tMap     The TileMap to check
+     * @param s The Sprite to check
+     * @param tMap The TileMap to check
      * @param tileChar The type of tile
-     * @param xPos     The tile's x position
-     * @param yPos     The tile's y position
+     * @param xPos The tile's x position
+     * @param yPos The tile's y position
      * @return true if s is on the given tile, false if not
      */
     public boolean isOnTileAtPosition(Sprite s, TileMap tMap, char tileChar, int xPos, int yPos) {
@@ -406,10 +406,9 @@ public class Game extends GameCore implements MouseListener {
     }
 
     /**
-     * Check and handles collisions with a tile map for the
-     * given sprite s.
+     * Checks and handles collisions with a tile map for the given sprite s.
      *
-     * @param s    The Sprite to check collisions for
+     * @param s The Sprite to check collisions for
      * @param tMap The tile map to check
      */
     public void handleTileCollision(Sprite s, TileMap tMap, ID id) {
@@ -683,11 +682,11 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Checks for and handles a collision with a horse shoe.
      *
-     * @param tMap  The TileMap to check
-     * @param id    The type of Sprite that has collided with the tile
+     * @param tMap The TileMap to check
+     * @param id The type of Sprite that has collided with the tile
      * @param xTile The x position of the tile
      * @param yTile The y position of the tile
-     * @param ch    The type of tile
+     * @param ch The type of tile
      */
     private void checkHandleHorseShoeCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
         if (ch == HORSE_SHOE_CHAR && id == ID.Player) {
@@ -707,11 +706,11 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Checks for and handles a collision with a disappearing tile.
      *
-     * @param tMap  The TileMap to check
-     * @param id    The type of Sprite that has collided with the tile
+     * @param tMap The TileMap to check
+     * @param id The type of Sprite that has collided with the tile
      * @param xTile The x position of the tile
      * @param yTile The y position of the tile
-     * @param ch    The type of tile
+     * @param ch The type of tile
      */
     private void checkHandleDisappearingTileCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
         if (ch == HAPPY_BLOCK_CHAR && id == ID.Player) {
@@ -735,11 +734,11 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Checks for and handles a collision with a heart tile.
      *
-     * @param tMap  The TileMap to check
-     * @param id    The type of Sprite that has collided with the tile
+     * @param tMap The TileMap to check
+     * @param id The type of Sprite that has collided with the tile
      * @param xTile The x position of the tile
      * @param yTile The y position of the tile
-     * @param ch    The type of tile
+     * @param ch The type of tile
      */
     private void checkHandleHeartCollision(TileMap tMap, ID id, int xTile, int yTile, char ch) {
         if (ch == HEART_CHAR && id == ID.Player) {
@@ -1047,8 +1046,8 @@ public class Game extends GameCore implements MouseListener {
     /**
      * Counts and returns the number of horse shoe tiles in the given tilemap.
      *
-     * @param tMap the TileMap to check
-     * @return the number of horse shoes in the tilemap
+     * @param tMap The TileMap to check
+     * @return The number of horse shoes in the tilemap
      */
     public int countHorseShoesInMap(TileMap tMap) {
         int mapWidth = tMap.getMapWidth();
@@ -1132,8 +1131,8 @@ public class Game extends GameCore implements MouseListener {
             backgroundX2 = imgBackground.getWidth(null);
             previousXOffset = 0;
 
-            //Initialise a 2D array to store the x and y velocity of each sprite in the level to use when pausing and
-            //resuming
+            //Initialise a 2D array to store the x and y velocity of each sprite
+            //in the level to use when pausing and resuming
             spriteVelocities = new float[2][sprites.size()];
 
             pauseTimer = 0;

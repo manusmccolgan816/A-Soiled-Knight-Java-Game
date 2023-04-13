@@ -7,7 +7,7 @@ package game2D;
 public class DisappearingTile extends Tile {
 
     public static final int TIME_TO_BREAK = 1750;
-    public static final int TIME_TO_REAPPEAR = 5000;
+    public static final int TIME_TO_REAPPEAR = 4000;
 
     private long stoodOnTimer;
     private long reloadTimer;
