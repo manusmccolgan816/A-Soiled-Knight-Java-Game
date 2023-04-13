@@ -2,6 +2,8 @@ import game2D.GameCore;
 
 import java.awt.*;
 
+// Student ID: 2816175
+
 /**
  * The HUD displays the player's health, the current level and
  * the number of horse shoes collected.

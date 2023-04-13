@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+// Student ID: 2816175
+
 /**
  * The Controls screen displays the controls of the game.
  */
@@ -41,7 +43,7 @@ public class Controls extends GameCore implements MouseListener {
         int mouseY = e.getY();
 
         //If Back is clicked...
-        if(mouseX >= backPosX && mouseX <= (backPosX + imgBack.getWidth(null)) && mouseY >= backPosY &&
+        if (mouseX >= backPosX && mouseX <= (backPosX + imgBack.getWidth(null)) && mouseY >= backPosY &&
                 mouseY <= backPosY + imgBack.getHeight(null)) {
             //Return to the menu screen
             game.initialiseMenu();

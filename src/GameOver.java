@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+// Student ID: 2816175
+
 /**
  * The GameOver screen is displayed when the player dies. From
  * here they can return to the menu screen or retry the level.
@@ -48,15 +50,15 @@ public class GameOver extends GameCore implements MouseListener {
         int mouseY = e.getY();
 
         //If Retry is clicked...
-        if(mouseX >= retryPosX && mouseX <= (retryPosX + imgRetry.getWidth(null)) && mouseY >= retryPosY &&
+        if (mouseX >= retryPosX && mouseX <= (retryPosX + imgRetry.getWidth(null)) && mouseY >= retryPosY &&
                 mouseY <= (retryPosY + imgRetry.getHeight(null))) {
-            //CURRENTLEVEL is decremented so that calling goToNextLevel() simply restarts the level the player died on
+            //currentLevel is decremented so that calling goToNextLevel() simply restarts the level the player died on
             Game.currentLevel--;
             game.initialiseGame();
             game.goToNextLevel();
         }
         //If Quit is clicked...
-        else if(mouseX >= quitPosX && mouseX <= (quitPosX + imgQuit.getWidth(null)) && mouseY >= quitPosY &&
+        else if (mouseX >= quitPosX && mouseX <= (quitPosX + imgQuit.getWidth(null)) && mouseY >= quitPosY &&
                 mouseY <= (quitPosY + imgQuit.getHeight(null))) {
             game.initialiseMenu();
         }

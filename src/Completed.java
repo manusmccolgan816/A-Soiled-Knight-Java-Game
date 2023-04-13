@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+// Student ID: 2816175
+
 /**
  * The Completed screen is that which is displayed when the player
  * completes the game.

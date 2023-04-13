@@ -8,6 +8,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+// Student ID: 2816175
+
 /**
  * The Menu screen is the starting point of the game from which
  * the user can navigate to Controls or begin the game on level 1.

@@ -1,3 +1,5 @@
+// Student ID: 2816175
+
 /**
  * ID is used to identify the type of sprite.
  */
